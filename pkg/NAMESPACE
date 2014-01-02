@@ -1,0 +1,2 @@
+useDynLib(sgd)
+exportPattern("^[[:alpha:]]+")

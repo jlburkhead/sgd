@@ -7,8 +7,8 @@
 using namespace Rcpp;
 
 // gradient_descent
-NumericVector gradient_descent(NumericMatrix X, NumericVector y, int max_epoch, double learning_rate, double momentum, double tol);
-RcppExport SEXP sgd_gradient_descent(SEXP XSEXP, SEXP ySEXP, SEXP max_epochSEXP, SEXP learning_rateSEXP, SEXP momentumSEXP, SEXP tolSEXP) {
+NumericVector gradient_descent(NumericMatrix X, NumericVector y, int max_epoch, double learning_rate, double momentum, bool verbose = false, double tol = 1.0e-7);
+RcppExport SEXP sgd_gradient_descent(SEXP XSEXP, SEXP ySEXP, SEXP max_epochSEXP, SEXP learning_rateSEXP, SEXP momentumSEXP, SEXP verboseSEXP, SEXP tolSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -18,8 +18,9 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< int >::type max_epoch(max_epochSEXP );
         Rcpp::traits::input_parameter< double >::type learning_rate(learning_rateSEXP );
         Rcpp::traits::input_parameter< double >::type momentum(momentumSEXP );
+        Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP );
         Rcpp::traits::input_parameter< double >::type tol(tolSEXP );
-        NumericVector __result = gradient_descent(X, y, max_epoch, learning_rate, momentum, tol);
+        NumericVector __result = gradient_descent(X, y, max_epoch, learning_rate, momentum, verbose, tol);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);
@@ -42,8 +43,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // stochastic_gradient_descent
-NumericVector stochastic_gradient_descent(NumericMatrix X, NumericVector y, int max_epoch, double learning_rate, double momentum, double tol);
-RcppExport SEXP sgd_stochastic_gradient_descent(SEXP XSEXP, SEXP ySEXP, SEXP max_epochSEXP, SEXP learning_rateSEXP, SEXP momentumSEXP, SEXP tolSEXP) {
+NumericVector stochastic_gradient_descent(NumericMatrix X, NumericVector y, int max_epoch, double learning_rate, double momentum, bool verbose = false, double tol = 1.0e-7);
+RcppExport SEXP sgd_stochastic_gradient_descent(SEXP XSEXP, SEXP ySEXP, SEXP max_epochSEXP, SEXP learning_rateSEXP, SEXP momentumSEXP, SEXP verboseSEXP, SEXP tolSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -53,8 +54,9 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< int >::type max_epoch(max_epochSEXP );
         Rcpp::traits::input_parameter< double >::type learning_rate(learning_rateSEXP );
         Rcpp::traits::input_parameter< double >::type momentum(momentumSEXP );
+        Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP );
         Rcpp::traits::input_parameter< double >::type tol(tolSEXP );
-        NumericVector __result = stochastic_gradient_descent(X, y, max_epoch, learning_rate, momentum, tol);
+        NumericVector __result = stochastic_gradient_descent(X, y, max_epoch, learning_rate, momentum, verbose, tol);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);

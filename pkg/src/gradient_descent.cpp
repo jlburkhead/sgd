@@ -3,7 +3,13 @@
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-NumericVector gradient_descent(NumericMatrix X, NumericVector y, int max_epoch, double learning_rate, double momentum, double tol) {
+NumericVector gradient_descent(NumericMatrix X, 
+			       NumericVector y, 
+			       int max_epoch, 
+			       double learning_rate, 
+			       double momentum, 
+			       bool verbose = false, 
+			       double tol = 1.0e-7) {
   
   // TODO: initialize weights more better
   NumericVector w = rnorm(X.ncol());
@@ -20,8 +26,11 @@ NumericVector gradient_descent(NumericMatrix X, NumericVector y, int max_epoch, 
     for (int i = 0; i < ce.size(); i++)
       l += ce[i];
     
-    Rcout.precision(10);
-    Rcout << "epoch " << e + 1 << " cross-entropy:\t" << std::fixed << l << std::endl;
+    if (verbose) {
+      Rcout.precision(10);
+      Rcout << "epoch " << e + 1 << " cross-entropy:\t" << std::fixed << l << std::endl;
+    }
+
     if (std::abs(last_l - l) < tol && e != 0)
       break;
 

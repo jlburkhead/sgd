@@ -29,7 +29,8 @@ coef(glm(y ~ X - 1, family = binomial))
 
 ```r
 
-gradient_descent(X, y, 10000, 0.01, 0.99)
+stochastic_gradient_descent(X, y, 10000, 0.01, 0.99, minibatch_size = nrow(X), 
+    shuffle = FALSE)  ## batch
 ```
 
 ```
@@ -37,11 +38,19 @@ gradient_descent(X, y, 10000, 0.01, 0.99)
 ```
 
 ```r
-stochastic_gradient_descent(X, y, 10000, 0.01, 0.99, minibatch_size = 10)
+stochastic_gradient_descent(X, y, 10000, 0.01, 0.99, minibatch_size = 10)  ## minibatch
 ```
 
 ```
 ## [1]  8.1487  0.1119 -3.2339
+```
+
+```r
+stochastic_gradient_descent(X, y, 10000, 0.01, 0.99, minibatch_size = 1)  ## stochastic
+```
+
+```
+## [1]  8.3935  0.1996 -3.2518
 ```
 
 

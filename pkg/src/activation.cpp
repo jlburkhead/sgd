@@ -1,12 +1,7 @@
 #include "activation.hpp"
 
-using namespace Rcpp;
-
-NumericMatrix activation(NumericMatrix X, arma::mat w) {
-  
-  arma::mat Xm = as< arma::mat >(X);
-  
-  return sigmoid(wrap(Xm * w));
+arma::mat activation(arma::mat X, arma::mat w) {
+  return sigmoid(X * w);
 }
 
 

@@ -2,6 +2,8 @@
 
 using namespace Rcpp;
 
+// TODO: change this ridiculously long name
+
 // [[Rcpp::export]]
 NumericVector stochastic_gradient_descent(NumericMatrix X, 
 					  NumericMatrix y, 
@@ -57,22 +59,19 @@ NumericVector stochastic_gradient_descent(NumericMatrix X,
 	end = n - 1;
       Range r(start, end);
       
-      NumericMatrix row(minibatch_size, 
-			p, 
-			X(r, _).begin());
-
-      NumericMatrix h = activation(row, w);
+      // TODO: convert these to arma::mat and make everything arma::mat
+      arma::mat X_minibatch = as< arma::mat >(wrap(X(r, _)));
+      arma::mat y_minibatch = as< arma::mat >(wrap(y(r, _)));
       
-      // everything from here on is arma::mat
-      arma::mat g = gradient(row,
-			     h,
-			     y(r, _)
-			     ); 
+      // only X and y use Rcpp::NumericMatrix
+      // everything else is arma::mat
+      arma::mat h = activation(X_minibatch, w);
+      arma::mat g = gradient(X_minibatch, y_minibatch, h); 
       
       delta_w = momentum * delta_w + (1 - momentum) * learning_rate * g;
       w = w - delta_w;
 
-      arma::mat ce = cross_entropy(y(r, _), h);
+      arma::mat ce = cross_entropy(y_minibatch, h);
       l += arma::accu(ce);
 
     }
@@ -82,6 +81,7 @@ NumericVector stochastic_gradient_descent(NumericMatrix X,
       Rcout << "epoch " << e + 1 << " cross-entropy:\t" << std::fixed << l << std::endl;
     }
     
+    // TODO: tol should be some proportion of last loss not an absolute level
     if (std::abs(last_l - l) < tol && e != 0)
       break;
     

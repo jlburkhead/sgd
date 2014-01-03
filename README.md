@@ -9,7 +9,8 @@ library(sgd)
 ```
 
 ```
-## Loading required package: Rcpp Loading required package: RcppArmadillo
+## Loading required package: Rcpp
+## Loading required package: RcppArmadillo
 ```
 
 ```r
@@ -21,7 +22,7 @@ X <- model.matrix(Species ~ Sepal.Length + Sepal.Width, data = iris)
 ```
 
 
-##### using <small>`stats::glm`</small> for binary classification
+##### using `stats::glm` for binary classification
 
 
 ```r
@@ -41,15 +42,15 @@ coef(glm(y ~ X - 1, family = binomial))
 
 ```r
 
-stochastic_gradient_descent(X, y, 10000, 0.01, 0.99, minibatch_size = nrow(X), 
+stochastic_gradient_descent(X, y, 10000, 0.01, 0.95, minibatch_size = nrow(X), 
     shuffle = FALSE)
 ```
 
 ```
 ##         [,1]
-## [1,]  8.0764
-## [2,]  0.1304
-## [3,] -3.2093
+## [1,]  8.0747
+## [2,]  0.1305
+## [3,] -3.2089
 ```
 
 
@@ -97,9 +98,9 @@ params
 
 ```
 ##        [,1]    [,2]    [,3]
-## [1,]  18.22  8.1521 -14.247
-## [2,] -10.26  0.1236   2.634
-## [3,]  12.00 -3.2315  -0.737
+## [1,]  17.86  8.1521 -14.247
+## [2,] -10.16  0.1236   2.634
+## [3,]  11.96 -3.2315  -0.737
 ```
 
 ```r
@@ -113,14 +114,14 @@ by(preds, iris$Species, colMeans)
 ```
 ## INDICES: setosa
 ##      V1      V2      V3 
-## 0.86028 0.10941 0.03031 
+## 0.86015 0.10953 0.03032 
 ## -------------------------------------------------------- 
 ## INDICES: versicolor
 ##      V1      V2      V3 
-## 0.01942 0.56313 0.41745 
+## 0.01978 0.56294 0.41727 
 ## -------------------------------------------------------- 
 ## INDICES: virginica
 ##       V1       V2       V3 
-## 0.003582 0.366710 0.629709
+## 0.003606 0.366720 0.629674
 ```
 

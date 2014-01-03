@@ -13,7 +13,7 @@ X <- model.matrix(Species ~ Sepal.Length + Sepal.Width, data = iris)
 
 ```
 
-##### using <small>`stats::glm`</small> for binary classification
+##### using `stats::glm` for binary classification
 
 ```{r glm}
 
@@ -26,7 +26,7 @@ coef(glm(y ~ X - 1, family = binomial))
 
 ```{r batch}
 
-stochastic_gradient_descent(X, y, 1e4, 0.01, 0.99, minibatch_size = nrow(X), shuffle = FALSE)
+stochastic_gradient_descent(X, y, 1e4, 0.01, 0.95, minibatch_size = nrow(X), shuffle = FALSE)
 
 ```
 

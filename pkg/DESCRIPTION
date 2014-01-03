@@ -6,7 +6,7 @@ Date: 2013-12-28
 Author: Jake Burkhead
 Maintainer: Jake Burkhead <jlburkhead@ucdavis.edu>
 Description: Toy package to mess around with using Rcpp and RcppArmadillo to
-    link c++ and R. Implements stochastic and batch gradient descent in c++.
+    link c++ and R. Implements gradient descent in c++.
 References: Machine Learning, Murphy, Kevin.
 License: BSD
 Depends:

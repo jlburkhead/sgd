@@ -9,8 +9,7 @@ library(sgd)
 ```
 
 ```
-## Loading required package: Rcpp
-## Loading required package: RcppArmadillo
+## Loading required package: Rcpp Loading required package: RcppArmadillo
 ```
 
 ```r
@@ -22,7 +21,7 @@ X <- model.matrix(Species ~ Sepal.Length + Sepal.Width, data = iris)
 ```
 
 
-using stats::glm for binary classification
+##### using <small>`stats::glm`</small> for binary classification
 
 
 ```r
@@ -36,7 +35,8 @@ coef(glm(y ~ X - 1, family = binomial))
 ```
 
 
-batch
+
+##### batch
 
 
 ```r
@@ -47,13 +47,13 @@ stochastic_gradient_descent(X, y, 10000, 0.01, 0.99, minibatch_size = nrow(X),
 
 ```
 ##         [,1]
-## [1,]  7.8988
-## [2,]  0.1397
-## [3,] -3.1665
+## [1,]  8.0764
+## [2,]  0.1304
+## [3,] -3.2093
 ```
 
 
-minibatch
+##### minibatch
 
 
 ```r
@@ -69,7 +69,7 @@ stochastic_gradient_descent(X, y, 10000, 0.01, 0.99, minibatch_size = 10)
 ```
 
 
-stochastic
+##### stochastic
 
 
 ```r
@@ -97,14 +97,14 @@ params
 
 ```
 ##        [,1]    [,2]    [,3]
-## [1,]  18.52  8.1521 -14.247
-## [2,] -10.34  0.1236   2.634
-## [3,]  12.03 -3.2315  -0.737
+## [1,]  18.22  8.1521 -14.247
+## [2,] -10.26  0.1236   2.634
+## [3,]  12.00 -3.2315  -0.737
 ```
 
 ```r
 
-preds <- sigmoid(X %*% params)
+preds <- plogis(X %*% params)  ## sigmoid
 preds <- t(apply(preds, 1, function(x) x/sum(x)))
 
 by(preds, iris$Species, colMeans)
@@ -113,14 +113,14 @@ by(preds, iris$Species, colMeans)
 ```
 ## INDICES: setosa
 ##      V1      V2      V3 
-## 0.86038 0.10931 0.03031 
+## 0.86028 0.10941 0.03031 
 ## -------------------------------------------------------- 
 ## INDICES: versicolor
 ##      V1      V2      V3 
-## 0.01911 0.56328 0.41760 
+## 0.01942 0.56313 0.41745 
 ## -------------------------------------------------------- 
 ## INDICES: virginica
 ##       V1       V2       V3 
-## 0.003561 0.366701 0.629737
+## 0.003582 0.366710 0.629709
 ```
 

@@ -13,7 +13,7 @@ X <- model.matrix(Species ~ Sepal.Length + Sepal.Width, data = iris)
 
 ```
 
-using stats::glm for binary classification
+##### using <small>`stats::glm`</small> for binary classification
 
 ```{r glm}
 
@@ -21,7 +21,8 @@ coef(glm(y ~ X - 1, family = binomial))
 
 ```
 
-batch
+
+##### batch
 
 ```{r batch}
 
@@ -29,7 +30,7 @@ stochastic_gradient_descent(X, y, 1e4, 0.01, 0.99, minibatch_size = nrow(X), shu
 
 ```
 
-minibatch
+##### minibatch
 
 ```{r minibatch}
 
@@ -37,7 +38,7 @@ stochastic_gradient_descent(X, y, 1e4, 0.01, 0.99, minibatch_size = 10)
 
 ```
 
-stochastic
+##### stochastic
 
 ```{r stochastic}
 
@@ -53,7 +54,7 @@ params <- stochastic_gradient_descent(X, multiclass_y, 1e4, 0.01, 0.99, minibatc
 
 params
 
-preds <- sigmoid(X %*% params)
+preds <- plogis(X %*% params) ## sigmoid
 preds <- t(apply(preds, 1, function(x) x / sum(x) ))
 
 by(preds, iris$Species, colMeans)

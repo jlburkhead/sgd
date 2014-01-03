@@ -28,6 +28,7 @@ NumericVector stochastic_gradient_descent(NumericMatrix X,
     
     double l = 0;
     
+    // TODO: put this back into a shuffle_matrix function
     if (shuffle) {
       IntegerVector index = seq_len(n);
       IntegerVector order = RcppArmadillo::sample(index,
@@ -55,13 +56,14 @@ NumericVector stochastic_gradient_descent(NumericMatrix X,
       if (end > n - 1)
 	end = n - 1;
       Range r(start, end);
-      arma::span s(start, end);
       
       NumericMatrix row(minibatch_size, 
 			p, 
 			X(r, _).begin());
 
       NumericMatrix h = activation(row, w);
+      
+      // everything from here on is arma::mat
       arma::mat g = gradient(row,
 			     h,
 			     y(r, _)

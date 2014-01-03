@@ -2,7 +2,6 @@
 
 using namespace Rcpp;
 
-// [[Rcpp::export]]
 NumericMatrix shuffle_matrix(Rcpp::NumericMatrix A) {
   
   IntegerVector index = seq_len(A.nrow());

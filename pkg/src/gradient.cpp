@@ -2,12 +2,12 @@
 
 using namespace Rcpp;
 
-NumericVector gradient(NumericMatrix X, NumericVector h, NumericVector y) {
+arma::mat gradient(NumericMatrix X, NumericMatrix h, NumericMatrix y) {
 
   arma::mat Xm = as< arma::mat >(X);
-  arma::colvec hm = as< arma::colvec >(h);
-  arma::colvec ym = as< arma::colvec >(y);
+  arma::mat hm = as< arma::mat >(h);
+  arma::mat ym = as< arma::mat >(y);
   
-  return wrap( Xm.t() * (hm - ym) );
+  return Xm.t() * (hm - ym);
   
 }

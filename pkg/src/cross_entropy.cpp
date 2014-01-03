@@ -2,12 +2,11 @@
 
 using namespace Rcpp;
 
-template <typename T>
-T cross_entropy(T y, T h) {
-  return -(y * log(h) + (1 - y) * log(1 - h));
+arma::mat cross_entropy(NumericMatrix y, NumericMatrix h) {
+  
+  arma::mat ym = as< arma::mat >(y);
+  arma::mat hm = as< arma::mat >(h);
+  
+  return -(ym % log(hm) + (1 - ym) % log(1 - hm));
+
 }
-
-template double cross_entropy< double >(double y, double h);
-template NumericVector cross_entropy< NumericVector >(NumericVector y, NumericVector h);
-
-// this won't work for Rcpp::NumericMatrix which kinda limits everything at this point to binary classification tasks

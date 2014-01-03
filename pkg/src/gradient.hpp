@@ -3,6 +3,6 @@
 
 #include <RcppArmadillo.h>
 
-Rcpp::NumericVector gradient(Rcpp::NumericMatrix X, Rcpp::NumericVector h, Rcpp::NumericVector y);
+arma::mat gradient(Rcpp::NumericMatrix X, Rcpp::NumericMatrix h, Rcpp::NumericMatrix y);
 
 #endif

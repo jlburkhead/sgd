@@ -3,6 +3,6 @@
 
 #include <RcppArmadillo.h>
 
-Rcpp::NumericVector sigmoid(Rcpp::NumericVector x);
+Rcpp::NumericMatrix sigmoid(Rcpp::NumericMatrix x);
 
 #endif

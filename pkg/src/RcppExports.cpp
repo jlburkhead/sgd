@@ -22,14 +22,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // sigmoid
-NumericVector sigmoid(NumericVector x);
+NumericMatrix sigmoid(NumericMatrix x);
 RcppExport SEXP sgd_sigmoid(SEXP xSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP );
-        NumericVector __result = sigmoid(x);
+        Rcpp::traits::input_parameter< NumericMatrix >::type x(xSEXP );
+        NumericMatrix __result = sigmoid(x);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);
@@ -37,14 +37,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // stochastic_gradient_descent
-NumericVector stochastic_gradient_descent(NumericMatrix X, NumericVector y, int max_epoch, double learning_rate, double momentum, int minibatch_size = 100, bool shuffle = true, bool verbose = false, double tol = 1.0e-7);
+NumericVector stochastic_gradient_descent(NumericMatrix X, NumericMatrix y, int max_epoch, double learning_rate, double momentum, int minibatch_size = 100, bool shuffle = true, bool verbose = false, double tol = 1.0e-7);
 RcppExport SEXP sgd_stochastic_gradient_descent(SEXP XSEXP, SEXP ySEXP, SEXP max_epochSEXP, SEXP learning_rateSEXP, SEXP momentumSEXP, SEXP minibatch_sizeSEXP, SEXP shuffleSEXP, SEXP verboseSEXP, SEXP tolSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
         Rcpp::traits::input_parameter< NumericMatrix >::type X(XSEXP );
-        Rcpp::traits::input_parameter< NumericVector >::type y(ySEXP );
+        Rcpp::traits::input_parameter< NumericMatrix >::type y(ySEXP );
         Rcpp::traits::input_parameter< int >::type max_epoch(max_epochSEXP );
         Rcpp::traits::input_parameter< double >::type learning_rate(learning_rateSEXP );
         Rcpp::traits::input_parameter< double >::type momentum(momentumSEXP );

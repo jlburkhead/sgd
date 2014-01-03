@@ -9,7 +9,7 @@
 #include "cross_entropy.hpp"
 
 Rcpp::NumericVector stochastic_gradient_descent(Rcpp::NumericMatrix X, 
-						Rcpp::NumericVector y, 
+						Rcpp::NumericMatrix y, 
 						int max_epoch, 
 						double learning_rate, 
 						double momentum, 

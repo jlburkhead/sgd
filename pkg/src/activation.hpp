@@ -5,6 +5,6 @@
 
 #include "sigmoid.hpp"
 
-Rcpp::NumericVector activation(Rcpp::NumericMatrix X, Rcpp::NumericVector w);
+Rcpp::NumericMatrix activation(Rcpp::NumericMatrix X, arma::mat w);
 
 #endif

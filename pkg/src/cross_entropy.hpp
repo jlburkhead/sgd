@@ -3,7 +3,6 @@
 
 #include <RcppArmadillo.h>
 
-template <typename T>
-T cross_entropy(T y, T h);
+arma::mat cross_entropy(Rcpp::NumericMatrix y, Rcpp::NumericMatrix h);
 
 #endif

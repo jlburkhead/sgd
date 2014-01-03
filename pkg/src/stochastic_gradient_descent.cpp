@@ -4,7 +4,7 @@ using namespace Rcpp;
 
 // [[Rcpp::export]]
 NumericVector stochastic_gradient_descent(NumericMatrix X, 
-					  NumericVector y, 
+					  NumericMatrix y, 
 					  int max_epoch, 
 					  double learning_rate, 
 					  double momentum,
@@ -15,13 +15,15 @@ NumericVector stochastic_gradient_descent(NumericMatrix X,
   
   int n = X.nrow(); // number of observations
   int p = X.ncol(); // dimensionality
+  int k = y.ncol(); // number of classes
   int minibatches = n / minibatch_size; // number of minibatches
 
   // TODO: initialize weights more better
-  NumericVector w = rnorm(p);
+  arma::mat w = arma::randn(p, k);
+  arma::mat delta_w(p, k);
+  delta_w.fill(0);
   double last_l = R_PosInf;
-  NumericVector delta_w(p);
-  
+    
   for (int e = 0; e < max_epoch; e++) {
     
     double l = 0;
@@ -33,18 +35,17 @@ NumericVector stochastic_gradient_descent(NumericMatrix X,
 						  false,
 						  NumericVector::create());
       NumericMatrix X_shuffled(n, p);
-      NumericVector y_shuffled(n);
+      NumericMatrix y_shuffled(n, k);
       
       for (int i = 0; i < n; i++) {
 	X_shuffled(i, _) = X(order[i] - 1, _);
-	y_shuffled(i) = y[order[i] - 1];
+	y_shuffled(i, _) = y(order[i] - 1, _);
       }
       
       X = X_shuffled;
       y = y_shuffled;
-    } 
-    
 
+    } 
 
     for (int i = 0; i < minibatches; i++) {
       
@@ -54,23 +55,24 @@ NumericVector stochastic_gradient_descent(NumericMatrix X,
       if (end > n - 1)
 	end = n - 1;
       Range r(start, end);
+      arma::span s(start, end);
       
       NumericMatrix row(minibatch_size, 
 			p, 
 			X(r, _).begin());
 
-      NumericVector h = activation(row, w);
-      NumericVector g = gradient(row,
-				 h,
-				 y[r]
-				 ); 
-
+      NumericMatrix h = activation(row, w);
+      arma::mat g = gradient(row,
+			     h,
+			     y(r, _)
+			     ); 
+      
       delta_w = momentum * delta_w + (1 - momentum) * learning_rate * g;
       w = w - delta_w;
 
-      NumericVector ce = cross_entropy< NumericVector >(y[r], h);
-      for (int j = 0; j < ce.size(); j++)
-      	l += ce[j];
+      arma::mat ce = cross_entropy(y(r, _), h);
+      l += arma::accu(ce);
+
     }
      
     if (verbose) {
@@ -85,7 +87,7 @@ NumericVector stochastic_gradient_descent(NumericMatrix X,
 
   }
 
-  return w;
+  return wrap(w);
 
 }
 

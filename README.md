@@ -45,11 +45,11 @@ gradient_descent(X, y, 10000, 0.01, 0.99)
 ```
 
 ```r
-stochastic_gradient_descent(X, y, 10000, 0.01, 0.99999)
+stochastic_gradient_descent(X, y, 10000, 0.01, 0.999)
 ```
 
 ```
-## [1]  8.0803  0.1294 -3.2080
+## [1]  8.1487  0.1143 -3.2322
 ```
 
 

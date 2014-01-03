@@ -4,7 +4,7 @@ test_that("sigmoid generates expected output", {
 
     sigmoid_R <- function(z) 1 / (1 + exp(-z)) ## should be the same as stats::plogis
 
-    X <- seq(-20, 20, by = 0.01)
+    X <- seq(-20, 20, length.out = 1111)
     random <- runif(100, -20, 20)
     
     ## test scalars

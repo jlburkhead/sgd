@@ -13,6 +13,7 @@ Rcpp::NumericVector stochastic_gradient_descent(Rcpp::NumericMatrix X,
 						int max_epoch, 
 						double learning_rate, 
 						double momentum, 
+						bool shuffle,
 						bool verbose, 
 						double tol);
 

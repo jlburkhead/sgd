@@ -13,6 +13,6 @@ X <- model.matrix(Species ~ Sepal.Length + Sepal.Width, data = iris)
 glm(y ~ X - 1, family = binomial)
 
 gradient_descent(X, y, 1e4, 0.01, 0.99)
-stochastic_gradient_descent(X, y, 1e4, 0.01, 0.99999)
+stochastic_gradient_descent(X, y, 1e4, 0.01, 0.999)
 ```
 

@@ -5,11 +5,15 @@ gradient_descent <- function(X, y, max_epoch, learning_rate, momentum, verbose =
     .Call('sgd_gradient_descent', PACKAGE = 'sgd', X, y, max_epoch, learning_rate, momentum, verbose, tol)
 }
 
+shuffle_matrix <- function(A) {
+    .Call('sgd_shuffle_matrix', PACKAGE = 'sgd', A)
+}
+
 sigmoid <- function(x) {
     .Call('sgd_sigmoid', PACKAGE = 'sgd', x)
 }
 
-stochastic_gradient_descent <- function(X, y, max_epoch, learning_rate, momentum, verbose = FALSE, tol = 1.0e-7) {
-    .Call('sgd_stochastic_gradient_descent', PACKAGE = 'sgd', X, y, max_epoch, learning_rate, momentum, verbose, tol)
+stochastic_gradient_descent <- function(X, y, max_epoch, learning_rate, momentum, shuffle = TRUE, verbose = FALSE, tol = 1.0e-7) {
+    .Call('sgd_stochastic_gradient_descent', PACKAGE = 'sgd', X, y, max_epoch, learning_rate, momentum, shuffle, verbose, tol)
 }
 

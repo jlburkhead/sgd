@@ -13,7 +13,7 @@ sigmoid <- function(x) {
     .Call('sgd_sigmoid', PACKAGE = 'sgd', x)
 }
 
-stochastic_gradient_descent <- function(X, y, max_epoch, learning_rate, momentum, shuffle = TRUE, verbose = FALSE, tol = 1.0e-7) {
-    .Call('sgd_stochastic_gradient_descent', PACKAGE = 'sgd', X, y, max_epoch, learning_rate, momentum, shuffle, verbose, tol)
+stochastic_gradient_descent <- function(X, y, max_epoch, learning_rate, momentum, minibatch_size = 100L, shuffle = TRUE, verbose = FALSE, tol = 1.0e-7) {
+    .Call('sgd_stochastic_gradient_descent', PACKAGE = 'sgd', X, y, max_epoch, learning_rate, momentum, minibatch_size, shuffle, verbose, tol)
 }
 

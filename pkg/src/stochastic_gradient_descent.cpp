@@ -7,13 +7,15 @@ NumericVector stochastic_gradient_descent(NumericMatrix X,
 					  NumericVector y, 
 					  int max_epoch, 
 					  double learning_rate, 
-					  double momentum, 
+					  double momentum,
+					  int minibatch_size = 100,
 					  bool shuffle = true,
 					  bool verbose = false, 
 					  double tol = 1.0e-7) {
   
   int n = X.nrow(); // number of observations
   int p = X.ncol(); // dimensionality
+  int minibatches = n / minibatch_size; // number of minibatches
 
   // TODO: initialize weights more better
   NumericVector w = rnorm(p);
@@ -43,20 +45,32 @@ NumericVector stochastic_gradient_descent(NumericMatrix X,
     } 
     
 
-    for (int i = 0; i < n; i++) {
-      NumericMatrix row(1, p, X(i, _).begin());
-            
+
+    for (int i = 0; i < minibatches; i++) {
+      
+      // make minibatch range
+      int start = i * minibatch_size;
+      int end = start + minibatch_size - 1;
+      if (end > n - 1)
+	end = n - 1;
+      Range r(start, end);
+      
+      NumericMatrix row(minibatch_size, 
+			p, 
+			X(r, _).begin());
+
       NumericVector h = activation(row, w);
       NumericVector g = gradient(row,
 				 h,
-				 NumericVector::create(y[i]) // slicing vector returns a double
+				 y[r]
 				 ); 
 
       delta_w = momentum * delta_w + (1 - momentum) * learning_rate * g;
       w = w - delta_w;
 
-      double ce = cross_entropy< double >(y[i], h[0]);
-      l += ce;
+      NumericVector ce = cross_entropy< NumericVector >(y[r], h);
+      for (int j = 0; j < ce.size(); j++)
+      	l += ce[j];
     }
      
     if (verbose) {

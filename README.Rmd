@@ -2,18 +2,60 @@ sgd
 ===========
 
 
-```{r}
+```{r setup}
 set.seed(42)
 library(sgd)
 
 data(iris)
-y <- as.numeric(iris$Species == "versicolor")
+y <- matrix(as.numeric(iris$Species == "versicolor"))
+multiclass_y <- model.matrix(~ Species - 1, data = iris)
 X <- model.matrix(Species ~ Sepal.Length + Sepal.Width, data = iris)
+
+```
+
+using stats::glm for binary classification
+
+```{r glm}
 
 coef(glm(y ~ X - 1, family = binomial))
 
-stochastic_gradient_descent(X, y, 1e4, 0.01, 0.99, minibatch_size = nrow(X), shuffle = FALSE) ## batch
-stochastic_gradient_descent(X, y, 1e4, 0.01, 0.99, minibatch_size = 10) ## minibatch
-stochastic_gradient_descent(X, y, 1e4, 0.01, 0.99, minibatch_size = 1) ## stochastic
 ```
 
+batch
+
+```{r batch}
+
+stochastic_gradient_descent(X, y, 1e4, 0.01, 0.99, minibatch_size = nrow(X), shuffle = FALSE)
+
+```
+
+minibatch
+
+```{r minibatch}
+
+stochastic_gradient_descent(X, y, 1e4, 0.01, 0.99, minibatch_size = 10)
+
+```
+
+stochastic
+
+```{r stochastic}
+
+stochastic_gradient_descent(X, y, 1e4, 0.01, 0.99, minibatch_size = 1)
+
+```
+
+## multiclass
+
+```{r multiclass}
+
+params <- stochastic_gradient_descent(X, multiclass_y, 1e4, 0.01, 0.99, minibatch_size = 10)
+
+params
+
+preds <- sigmoid(X %*% params)
+preds <- t(apply(preds, 1, function(x) x / sum(x) ))
+
+by(preds, iris$Species, colMeans)
+
+```

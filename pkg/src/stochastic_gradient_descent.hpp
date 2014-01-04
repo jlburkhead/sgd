@@ -15,7 +15,7 @@ Rcpp::NumericVector stochastic_gradient_descent(Rcpp::NumericMatrix X,
 						double momentum, 
 						int minibatch_size,
 						bool shuffle,
-						bool verbose, 
+						int verbosity, 
 						double tol);
 
 #endif

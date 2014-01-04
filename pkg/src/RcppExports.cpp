@@ -7,8 +7,8 @@
 using namespace Rcpp;
 
 // stochastic_gradient_descent
-NumericVector stochastic_gradient_descent(NumericMatrix X, NumericMatrix y, int max_epoch, double learning_rate, double momentum, int minibatch_size = 100, bool shuffle = true, bool verbose = false, double tol = 1.0e-7);
-RcppExport SEXP sgd_stochastic_gradient_descent(SEXP XSEXP, SEXP ySEXP, SEXP max_epochSEXP, SEXP learning_rateSEXP, SEXP momentumSEXP, SEXP minibatch_sizeSEXP, SEXP shuffleSEXP, SEXP verboseSEXP, SEXP tolSEXP) {
+NumericVector stochastic_gradient_descent(NumericMatrix X, NumericMatrix y, int max_epoch, double learning_rate, double momentum, int minibatch_size = 100, bool shuffle = true, int verbosity = 0, double tol = 1.0e-7);
+RcppExport SEXP sgd_stochastic_gradient_descent(SEXP XSEXP, SEXP ySEXP, SEXP max_epochSEXP, SEXP learning_rateSEXP, SEXP momentumSEXP, SEXP minibatch_sizeSEXP, SEXP shuffleSEXP, SEXP verbositySEXP, SEXP tolSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -20,9 +20,9 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< double >::type momentum(momentumSEXP );
         Rcpp::traits::input_parameter< int >::type minibatch_size(minibatch_sizeSEXP );
         Rcpp::traits::input_parameter< bool >::type shuffle(shuffleSEXP );
-        Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP );
+        Rcpp::traits::input_parameter< int >::type verbosity(verbositySEXP );
         Rcpp::traits::input_parameter< double >::type tol(tolSEXP );
-        NumericVector __result = stochastic_gradient_descent(X, y, max_epoch, learning_rate, momentum, minibatch_size, shuffle, verbose, tol);
+        NumericVector __result = stochastic_gradient_descent(X, y, max_epoch, learning_rate, momentum, minibatch_size, shuffle, verbosity, tol);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);

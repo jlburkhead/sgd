@@ -12,13 +12,14 @@ NumericVector stochastic_gradient_descent(NumericMatrix X,
 					  double momentum,
 					  int minibatch_size = 100,
 					  bool shuffle = true,
-					  bool verbose = false, 
+					  int verbosity = 0,
 					  double tol = 1.0e-7) {
   
   int n = X.nrow(); // number of observations
   int p = X.ncol(); // dimensionality
   int k = y.ncol(); // number of classes
   int minibatches = n / minibatch_size; // number of minibatches
+  Rcout.precision(10); // precision for print statements
 
   // TODO: initialize weights more better
   arma::mat w = arma::randn(p, k);
@@ -59,7 +60,6 @@ NumericVector stochastic_gradient_descent(NumericMatrix X,
 	end = n - 1;
       Range r(start, end);
       
-      // TODO: convert these to arma::mat and make everything arma::mat
       arma::mat X_minibatch = as< arma::mat >(wrap(X(r, _)));
       arma::mat y_minibatch = as< arma::mat >(wrap(y(r, _)));
       
@@ -67,7 +67,11 @@ NumericVector stochastic_gradient_descent(NumericMatrix X,
       // everything else is arma::mat
       arma::mat h = activation(X_minibatch, w);
       arma::mat g = gradient(X_minibatch, y_minibatch, h); 
-      
+
+      if (verbosity >= 2)
+	for (int j = 0; j < p; j++)
+	  Rcout << std::fixed << w[j] << std::endl;
+
       delta_w = momentum * delta_w + (1 - momentum) * learning_rate * g;
       w = w - delta_w;
 
@@ -76,8 +80,7 @@ NumericVector stochastic_gradient_descent(NumericMatrix X,
 
     }
      
-    if (verbose) {
-      Rcout.precision(10);
+    if (verbosity >= 1) {
       Rcout << "epoch " << e + 1 << " cross-entropy:\t" << std::fixed << l << std::endl;
     }
     

@@ -11,6 +11,7 @@ NumericVector stochastic_gradient_descent(NumericMatrix X,
 					  double learning_rate, 
 					  double momentum,
 					  int minibatch_size = 100,
+					  double l2_reg = 0.0,
 					  bool shuffle = true,
 					  int verbosity = 0,
 					  double tol = 1.0e-7) {
@@ -63,10 +64,8 @@ NumericVector stochastic_gradient_descent(NumericMatrix X,
       arma::mat X_minibatch = as< arma::mat >(wrap(X(r, _)));
       arma::mat y_minibatch = as< arma::mat >(wrap(y(r, _)));
       
-      // only X and y use Rcpp::NumericMatrix
-      // everything else is arma::mat
       arma::mat h = activation(X_minibatch, w);
-      arma::mat g = gradient(X_minibatch, y_minibatch, h); 
+      arma::mat g = gradient(X_minibatch, y_minibatch, h) + l2_reg * w; 
 
       if (verbosity >= 2)
 	for (int j = 0; j < p; j++)

@@ -22,6 +22,8 @@ NumericVector stochastic_gradient_descent(NumericMatrix X,
   Rcout.precision(10); // precision for print statements
 
   // TODO: initialize weights more better
+  arma::mat Xm = as< arma::mat >(X);
+  arma::mat ym = as< arma::mat >(y);
   arma::mat w = arma::randn(p, k);
   arma::mat delta_w(p, k);
   delta_w.fill(0);
@@ -31,36 +33,37 @@ NumericVector stochastic_gradient_descent(NumericMatrix X,
     double l = 0;
     
     // TODO: put this back into a shuffle_matrix function
-    if (shuffle) {
+    if (shuffle && minibatch_size != n) {
       IntegerVector index = seq_len(n);
       IntegerVector order = RcppArmadillo::sample(index,
 						  n,
 						  false,
 						  NumericVector::create());
-      NumericMatrix X_shuffled(n, p);
-      NumericMatrix y_shuffled(n, k);
+      arma::mat X_shuffled(n, p);
+      arma::mat y_shuffled(n, k);
       
       for (int i = 0; i < n; i++) {
-	X_shuffled(i, _) = X(order[i] - 1, _);
-	y_shuffled(i, _) = y(order[i] - 1, _);
+	X_shuffled(i, arma::span::all) = Xm(order[i] - 1, arma::span::all);
+	y_shuffled(i, arma::span::all) = ym(order[i] - 1, arma::span::all);
       }
       
-      X = X_shuffled;
-      y = y_shuffled;
+      Xm = X_shuffled;
+      ym = y_shuffled;
 
     } 
-
+    
+    // TODO: fix bug, last minibatch isn't going to run
     for (int i = 0; i < minibatches; i++) {
       
-      // make minibatch range
+      // make minibatch span
       int start = i * minibatch_size;
       int end = start + minibatch_size - 1;
       if (end > n - 1)
 	end = n - 1;
-      Range r(start, end);
+      arma::span s(start, end);
       
-      arma::mat X_minibatch = as< arma::mat >(wrap(X(r, _)));
-      arma::mat y_minibatch = as< arma::mat >(wrap(y(r, _)));
+      arma::mat X_minibatch = Xm(s, arma::span::all);
+      arma::mat y_minibatch = ym(s, arma::span::all);
       
       arma::mat h = activation(X_minibatch, w);
       arma::mat g = gradient(X_minibatch, y_minibatch, h) + l2_reg * w; 

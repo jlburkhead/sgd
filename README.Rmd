@@ -26,7 +26,7 @@ coef(glm(y ~ X - 1, family = binomial))
 
 ```{r batch}
 
-stochastic_gradient_descent(X, y, 1e4, 0.01, 0.95, minibatch_size = nrow(X), shuffle = FALSE)
+stochastic_gradient_descent(X, y, 1500, 0.1, 0.99, minibatch_size = nrow(X), shuffle = FALSE)
 
 ```
 

@@ -13,6 +13,8 @@ Depends:
     Rcpp (>= 0.10.6),
     RcppArmadillo (>= 0.3.930.1)
 LinkingTo: Rcpp, RcppArmadillo
+Suggests:
+    testthat
 Collate:
     'RcppExports.R'
 

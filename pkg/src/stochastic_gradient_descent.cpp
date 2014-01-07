@@ -18,7 +18,7 @@ NumericVector stochastic_gradient_descent(NumericMatrix X,
   int n = X.nrow(); // number of observations
   int p = X.ncol(); // dimensionality
   int k = y.ncol(); // number of classes
-  int minibatches = n / minibatch_size; // number of minibatches
+  int minibatches = (n - 1) / minibatch_size + 1; // number of minibatches
   Rcout.precision(10); // precision for print statements
 
   // TODO: initialize weights more better
@@ -54,7 +54,7 @@ NumericVector stochastic_gradient_descent(NumericMatrix X,
     
     // TODO: fix bug, last minibatch isn't going to run
     for (int i = 0; i < minibatches; i++) {
-      
+
       // make minibatch span
       int start = i * minibatch_size;
       int end = start + minibatch_size - 1;

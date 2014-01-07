@@ -32,25 +32,8 @@ NumericVector stochastic_gradient_descent(NumericMatrix X,
     
     double l = 0;
     
-    // TODO: put this back into a shuffle_matrix function
-    if (shuffle && minibatch_size != n) {
-      IntegerVector index = seq_len(n);
-      IntegerVector order = RcppArmadillo::sample(index,
-						  n,
-						  false,
-						  NumericVector::create());
-      arma::mat X_shuffled(n, p);
-      arma::mat y_shuffled(n, k);
-      
-      for (int i = 0; i < n; i++) {
-	X_shuffled(i, arma::span::all) = Xm(order[i] - 1, arma::span::all);
-	y_shuffled(i, arma::span::all) = ym(order[i] - 1, arma::span::all);
-      }
-      
-      Xm = X_shuffled;
-      ym = y_shuffled;
-
-    } 
+    if (shuffle && minibatch_size != n)
+      shuffle_matrix(Xm, ym);
     
     for (int i = 0; i < minibatches; i++) {
 
@@ -79,10 +62,9 @@ NumericVector stochastic_gradient_descent(NumericMatrix X,
 
     }
      
-    if (verbosity >= 1) {
+    if (verbosity >= 1)
       Rcout << "epoch " << e + 1 << " cross-entropy:\t" << std::fixed << l << std::endl;
-    }
-    
+
   }
 
   return wrap(w);

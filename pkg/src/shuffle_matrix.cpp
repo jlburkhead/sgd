@@ -2,19 +2,23 @@
 
 using namespace Rcpp;
 
-NumericMatrix shuffle_matrix(Rcpp::NumericMatrix A) {
+void shuffle_matrix(arma::mat& A, arma::mat& B) {
   
-  IntegerVector index = seq_len(A.nrow());
+  IntegerVector index = seq_len(A.n_rows);
   IntegerVector order = RcppArmadillo::sample(index, 
 					      index.size(), 
 					      false, 
 					      NumericVector::create());
-  NumericMatrix out(A.nrow(), A.ncol());
+  arma::mat newA(A.n_rows, A.n_cols);
+  arma::mat newB(B.n_rows, B.n_cols);
   
-  for (int i = 0; i < order.size(); i++)
-    out(i, _) = A(order[i] - 1, _);
+  for (int i = 0; i < order.size(); i++) {
+    newA(i, arma::span::all) = A(order[i] - 1, arma::span::all);
+    newB(i, arma::span::all) = B(order[i] - 1, arma::span::all);
+  }
 
-  return out;
+  A = newA;
+  B = newB;
 
 }
 

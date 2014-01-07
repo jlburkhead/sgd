@@ -1,17 +1,16 @@
 Package: sgd
 Type: Package
 Title: (Stochastic)? Gradient Descent
-Version: 1.0
+Version: 0.0.0
 Date: 2013-12-28
 Author: Jake Burkhead
 Maintainer: Jake Burkhead <jlburkhead@ucdavis.edu>
 Description: Toy package to mess around with using Rcpp and RcppArmadillo to
     link c++ and R. Implements gradient descent in c++.
 References: Machine Learning, Murphy, Kevin.
-License: BSD
+License: BSD_2_clause
 Depends:
-    Rcpp (>= 0.10.6),
-    RcppArmadillo (>= 0.3.930.1)
+    R (>= 3.0.0)
 LinkingTo: Rcpp, RcppArmadillo
 Suggests:
     testthat

@@ -52,7 +52,6 @@ NumericVector stochastic_gradient_descent(NumericMatrix X,
 
     } 
     
-    // TODO: fix bug, last minibatch isn't going to run
     for (int i = 0; i < minibatches; i++) {
 
       // make minibatch span

@@ -1,10 +1,20 @@
 sgd
 ===========
 
+```{r knitr_options, echo=FALSE}
 
-```{r setup}
-set.seed(42)
+opts_chunk$set(warning = FALSE)
+
+```
+
+```{r setup, message=FALSE}
+
+ptm <- proc.time()
+
 library(sgd)
+library(rbenchmark)
+
+set.seed(42)
 
 data(iris)
 y <- matrix(as.numeric(iris$Species == "versicolor"))
@@ -58,5 +68,121 @@ preds <- plogis(X %*% params) ## sigmoid
 preds <- t(apply(preds, 1, function(x) x / sum(x) ))
 
 by(preds, iris$Species, colMeans)
+
+```
+
+# Benchmarks
+
+```{r benchmark_setup, echo=FALSE}
+
+sigmoid <- function(x) 1 / (1 + exp(-x))
+activation <- function(X, w) sigmoid(X %*% w)
+gradient <- function(X, y, h) t(X) %*% (h - y)
+
+sgd_R <- function(X, y, epochs, learning_rate, momentum)
+  {
+    
+    n <- nrow(X)
+    p <- ncol(X)
+    k <- ncol(y)
+
+    w <- matrix(rnorm(p * k), p, k)
+    delta_w <- matrix(0, p, k)
+
+    for (e in 1:epochs) {
+
+      h <- activation(X, w)
+      g <- gradient(X, y, h)
+
+      delta_w <- momentum * delta_w + (1 - momentum) * learning_rate * g
+      w <- w - delta_w
+      
+    }
+
+    return(w)
+    
+  }
+
+```
+
+## Iris benchmarks
+
+```{r small_bench}
+
+data(iris)
+set.seed(42)
+
+y <- matrix(as.numeric(iris$Species == "versicolor"))
+X <- model.matrix(Species ~ Sepal.Length + Sepal.Width, data = iris)
+X[,-1] <- scale(X[,-1])
+
+benchmark(
+    glm = glm(y ~ X - 1, family = binomial),
+    sgd_R = sgd_R(X, y, 500, 0.01, 0.95),
+    sgd = stochastic_gradient_descent(X, y, 500, 0.01, 0.95, nrow(X), shuffle = FALSE),
+    replications = 100
+  )
+
+```
+
+## Test against MNIST data
+
+```{r setup_mnist, echo=FALSE}
+
+untar("mnist.csv.tar.gz")
+d <- read.csv("mnist.csv")
+d[-1] <- scale(d[-1]) ## quick
+
+train_idx <- sample(1:10, nrow(d), replace = TRUE)
+
+train <- d[train_idx != 1,]
+
+nan <- sapply(train, function(x) any(is.nan(x)) )
+
+train <- train[!nan]
+valid <- d[train_idx == 1, !nan]
+
+train_X <- model.matrix(label ~ ., data = train)
+train_y <- model.matrix(~ factor(train$label) - 1)
+
+valid_X <- model.matrix(label ~ ., data = valid)
+```
+
+```{r test_mnist}
+
+params <- stochastic_gradient_descent(train_X, train_y, 100, 0.01, 0.95, minibatch_size = nrow(train_X))
+
+valid_pred <- plogis(valid_X %*% params)
+valid_pred <- apply(valid_pred, 1, which.max) - 1
+
+```
+
+missclassification rate: `r mean(valid_pred != valid$label)`
+
+
+## More benchmarks
+
+```{r moar_benchmarks}
+
+benchmark(
+    glm = glm(train_y[1:5000,1] ~ train_X[1:5000,], family = binomial),
+    sgd_batch = stochastic_gradient_descent(train_X[1:5000,], train_y[1:5000, 1, drop = FALSE], 100, 0.01, 0.99, nrow(train_X), shuffle = FALSE),
+    sgd_mb100 = stochastic_gradient_descent(train_X[1:5000,], train_y[1:5000, 1, drop = FALSE], 100, 0.01, 0.99, 100),
+    sgd_stochastic = stochastic_gradient_descent(train_X[1:5000,], train_y[1:5000, 1, drop = FALSE], 100, 0.01, 0.99, 1),
+  replications = 1
+  )
+
+```
+
+```{r wrapup}
+
+proc.time() - ptm
+sessionInfo()
+
+```
+
+```{r cleanup, echo=FALSE}
+
+invisible(file.remove("mnist.csv"))
 
 ```

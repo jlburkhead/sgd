@@ -1,5 +1,6 @@
 #include <RcppArmadillo.h>
 
+#include "sigmoid.hpp"
 #include "stochastic_gradient_descent.hpp"
 
 using namespace Rcpp;
@@ -34,6 +35,16 @@ public:
     return wrap(w);
   }
   
+  NumericMatrix predict(NumericMatrix X) {
+    arma::mat Xm = as< arma::mat >(X);
+    return wrap(Xm * w);
+  }
+  
+  NumericMatrix predict_proba(NumericMatrix X) {
+    arma::mat Xm = as< arma::mat >(X);
+    return wrap(sigmoid(Xm * w));
+  }
+  
 private:
   int epochs, minibatch_size, verbosity;
   double learning_rate, momentum, l2_reg;
@@ -49,5 +60,7 @@ RCPP_MODULE(LinearModels) {
     .method("Params", &logistic_regression::params)
     .method("Fit", &logistic_regression::fit)
     .method("Coef", &logistic_regression::coef)
+    .method("Predict", &logistic_regression::predict)
+    .method("Predict_proba", &logistic_regression::predict_proba)
     ;
 }

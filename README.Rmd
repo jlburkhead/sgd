@@ -36,7 +36,9 @@ coef(glm(y ~ X - 1, family = binomial))
 
 ```{r batch}
 
-stochastic_gradient_descent(X, y, 1500, 0.1, 0.99, minibatch_size = nrow(X), shuffle = FALSE)
+batch <- LogisticRegression(epochs = 1500, learning_rate = 0.1, momentum = 0.99, minibatch_size = 0)
+batch$Fit(X, y)
+batch$Coef()
 
 ```
 
@@ -44,7 +46,9 @@ stochastic_gradient_descent(X, y, 1500, 0.1, 0.99, minibatch_size = nrow(X), shu
 
 ```{r minibatch}
 
-stochastic_gradient_descent(X, y, 1e4, 0.01, 0.99, minibatch_size = 10)
+minibatch <- LogisticRegression(epochs = 1e4, learning_rate = 0.01, momentum = 0.99, minibatch_size = 10)
+minibatch$Fit(X, y)
+minibatch$Coef()
 
 ```
 
@@ -52,7 +56,9 @@ stochastic_gradient_descent(X, y, 1e4, 0.01, 0.99, minibatch_size = 10)
 
 ```{r stochastic}
 
-stochastic_gradient_descent(X, y, 1e4, 0.01, 0.99, minibatch_size = 1)
+stochastic <- LogisticRegression(epochs = 1e4, learning_rate = 0.01, momentum = 0.99, minibatch_size = 1)
+stochastic$Fit(X, y)
+stochastic$Coef()
 
 ```
 
@@ -60,9 +66,10 @@ stochastic_gradient_descent(X, y, 1e4, 0.01, 0.99, minibatch_size = 1)
 
 ```{r multiclass}
 
-params <- stochastic_gradient_descent(X, multiclass_y, 1e4, 0.01, 0.99, minibatch_size = 10)
+multiclass <- LogisticRegression(epochs = 1e4, learning_rate = 0.01, momentum = 0.99, minibatch_size = 10)
+multiclass$Fit(X, multiclass_y)
 
-params
+params <- multiclass$Coef()
 
 preds <- plogis(X %*% params) ## sigmoid
 preds <- t(apply(preds, 1, function(x) x / sum(x) ))
@@ -116,10 +123,12 @@ y <- matrix(as.numeric(iris$Species == "versicolor"))
 X <- model.matrix(Species ~ Sepal.Length + Sepal.Width, data = iris)
 X[,-1] <- scale(X[,-1])
 
+sgd <- LogisticRegression(epochs = 500, learning_rate = 0.01, momentum = 0.95, minibatch_size = 0)
+
 benchmark(
     glm = glm(y ~ X - 1, family = binomial),
     sgd_R = sgd_R(X, y, 500, 0.01, 0.95),
-    sgd = stochastic_gradient_descent(X, y, 500, 0.01, 0.95, nrow(X), shuffle = FALSE),
+    sgd = sgd$Fit(X, y),
     replications = 100
   )
 
@@ -150,9 +159,10 @@ valid_X <- model.matrix(label ~ ., data = valid)
 
 ```{r test_mnist}
 
-params <- stochastic_gradient_descent(train_X, train_y, 100, 0.01, 0.95, minibatch_size = nrow(train_X))
+mnist <- LogisticRegression(momentum = 0.95, minibatch_size = 0)
+mnist$Fit(train_X, train_y)
 
-valid_pred <- plogis(valid_X %*% params)
+valid_pred <- mnist$Predict_proba(valid_X)
 valid_pred <- apply(valid_pred, 1, which.max) - 1
 
 ```
@@ -160,9 +170,9 @@ valid_pred <- apply(valid_pred, 1, which.max) - 1
 missclassification rate: `r mean(valid_pred != valid$label)`
 
 
-## More benchmarks
+## More benchmarks to come
 
-```{r moar_benchmarks}
+```{r moar_benchmarks, eval=FALSE, echo=FALSE}
 
 benchmark(
     glm = glm(train_y[1:5000,1] ~ train_X[1:5000,], family = binomial),

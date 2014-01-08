@@ -27,6 +27,9 @@ NumericVector stochastic_gradient_descent(NumericMatrix X,
   arma::mat w = arma::randn(p, k);
   arma::mat delta_w(p, k);
   delta_w.fill(0);
+  arma::mat lambda(p, k);
+  lambda.fill(l2_reg);
+  lambda(0, 0) = 0; // don't penalize bias
     
   for (int e = 0; e < epochs; e++) {
     
@@ -48,7 +51,7 @@ NumericVector stochastic_gradient_descent(NumericMatrix X,
       arma::mat y_minibatch = ym(s, arma::span::all);
       
       arma::mat h = activation(X_minibatch, w);
-      arma::mat g = gradient(X_minibatch, y_minibatch, h) + l2_reg * w; 
+      arma::mat g = gradient(X_minibatch, y_minibatch, h) + lambda % w; 
 
       if (verbosity >= 2)
 	for (int j = 0; j < p; j++)

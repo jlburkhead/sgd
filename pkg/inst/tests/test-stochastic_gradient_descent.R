@@ -88,7 +88,7 @@ test_that("l2_reg shrinks weights", {
 
     p <- do.call(cbind, p)
 
-    norms <- apply(p, 2, function(x) sum(x ^ 2) )
+    norms <- apply(p, 2, function(x) sum(x[-1] ^ 2) ) ## ignore bias
 
     expect_true(all(diff(norms) < 0))
 

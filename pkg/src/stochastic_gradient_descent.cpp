@@ -1,5 +1,6 @@
 #include "stochastic_gradient_descent.hpp"
 
+
 using namespace Rcpp;
 
 // TODO: change this ridiculously long name

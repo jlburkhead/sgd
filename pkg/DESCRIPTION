@@ -10,10 +10,11 @@ Description: Toy package to mess around with using Rcpp and RcppArmadillo to
 References: Machine Learning, Murphy, Kevin.
 License: BSD_2_clause
 Depends:
-    R (>= 3.0.0)
+    R (>= 3.0.0), Rcpp (>= 0.10.6)
 LinkingTo: Rcpp, RcppArmadillo
 Suggests:
     testthat
 Collate:
     'RcppExports.R'
-
+    'zzz.R'
+RcppModules: LinearModels

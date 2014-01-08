@@ -4,6 +4,7 @@
 #include <RcppArmadillo.h>
 #include <RcppArmadilloExtensions/sample.h>
 
-Rcpp::NumericMatrix shuffle_matrix(Rcpp::NumericMatrix A);
+void shuffle_matrix(arma::mat& A, arma::mat& B);
+void print_mat(arma::mat A, arma::mat B);
 
 #endif

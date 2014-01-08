@@ -2,11 +2,11 @@
 #define _sgd_STOCHASTIC_GRADIENT_DESCENT_H
 
 #include <RcppArmadillo.h>
-#include <RcppArmadilloExtensions/sample.h>
 
 #include "gradient.hpp"
 #include "activation.hpp"
 #include "cross_entropy.hpp"
+#include "shuffle_matrix.hpp"
 
 Rcpp::NumericVector stochastic_gradient_descent(Rcpp::NumericMatrix X, 
 						Rcpp::NumericMatrix y, 

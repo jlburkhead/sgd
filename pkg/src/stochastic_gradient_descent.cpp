@@ -15,6 +15,7 @@ void stochastic_gradient_descent(NumericMatrix X,
 				 bool shuffle = true,
 				 int verbosity = 0) {
   
+  RNGScope scope;
   int n = X.nrow(); // number of observations
   int p = X.ncol(); // dimensionality
   int k = y.ncol(); // number of classes

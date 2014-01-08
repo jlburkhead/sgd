@@ -6,6 +6,15 @@
 
 using namespace Rcpp;
 
+/***
+
+The benefit of doing this is that it leverages c++ OOP a little and mimics sklearn's API which I like.
+
+The major downside is there is no class inheritance so class definitions will have to be very verbose. ie it would be
+incredible to have a base_regressor class which has everything then a custom fit and predict functions but as far as i can
+tell that is not possible using Rcpp modules.
+  
+ */
 
 class linear_regression {
 public:

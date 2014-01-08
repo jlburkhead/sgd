@@ -49,9 +49,9 @@ batch$Coef()
 
 ```
 ##         [,1]
-## [1,]  8.0913
-## [2,]  0.1288
-## [3,] -3.2112
+## [1,]  8.0927
+## [2,]  0.1293
+## [3,] -3.2129
 ```
 
 
@@ -111,15 +111,15 @@ by(preds, iris$Species, colMeans)
 ```
 ## INDICES: setosa
 ##      V1      V2      V3 
-## 0.86022 0.10946 0.03032 
+## 0.86023 0.10945 0.03032 
 ## -------------------------------------------------------- 
 ## INDICES: versicolor
 ##      V1      V2      V3 
-## 0.01957 0.56305 0.41738 
+## 0.01955 0.56306 0.41739 
 ## -------------------------------------------------------- 
 ## INDICES: virginica
-##       V1       V2       V3 
-## 0.003592 0.366714 0.629694
+##      V1      V2      V3 
+## 0.00359 0.36671 0.62970
 ```
 
 
@@ -149,9 +149,9 @@ benchmark(glm = glm(y ~ X - 1, family = binomial), sgd_R = sgd_R(X, y, 500,
 
 ```
 ##    test replications elapsed relative user.self sys.self user.child
-## 1   glm          100   0.267    1.146     0.266    0.000          0
-## 3   sgd          100   0.233    1.000     0.234    0.000          0
-## 2 sgd_R          100   1.556    6.678     1.550    0.005          0
+## 1   glm          100   0.264    1.123     0.264    0.000          0
+## 3   sgd          100   0.235    1.000     0.235    0.000          0
+## 2 sgd_R          100   1.577    6.711     1.565    0.006          0
 ##   sys.child
 ## 1         0
 ## 3         0
@@ -175,7 +175,7 @@ valid_pred <- apply(valid_pred, 1, which.max) - 1
 ```
 
 
-missclassification rate: 0.0955
+missclassification rate: 0.093
 
 
 ## More benchmarks to come
@@ -191,7 +191,7 @@ proc.time() - ptm
 
 ```
 ##    user  system elapsed 
-##  128.29   29.08  157.65
+##  127.87   29.71  157.74
 ```
 
 ```r

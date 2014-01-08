@@ -1,4 +1,4 @@
-context("stochastic_gradient_descent")
+context("LinearModels")
 
 make_data <- function(p, k, n = 100)
     list(
@@ -6,7 +6,7 @@ make_data <- function(p, k, n = 100)
         y = matrix(sample(0:1, n * k, replace = TRUE), n, k)
         )
 
-test_that("stochastic_gradient_descent converges to glm's output", {
+test_that("LogisticRegression converges to glm's output", {
 
     data(iris)
     y <- as.matrix(as.numeric(iris$Species == "versicolor"))
@@ -15,66 +15,38 @@ test_that("stochastic_gradient_descent converges to glm's output", {
     
     target <- coef(glm(y ~ X - 1, family = binomial))
 
-    batch <- LogisticRegression(
-        list(
-            epochs = 1e5,
-            learning_rate = 0.01,
-            momentum = 0.95,
-            minibatch_size = nrow(X),
-            l2_reg = 0,
-            shuffle = TRUE,
-            verbosity = 0
-            )
-        )
+    batch <- LogisticRegression(epochs = 1e5, momentum = 0.95, minibatch_size = 0)
     batch$Fit(X, y)
-    
-    params_minibatch <- stochastic_gradient_descent(
-        X,
-        y,    
-        1e5,
-        0.001,
-        0.99,
-        100
-        )
-    
-    params_stochastic <- stochastic_gradient_descent(
-        X,
-        y,    
-        1e5,
-        0.001,
-        0.99,
-        1
-        )
-        
+
     expect_equivalent(as.numeric(batch$Coef()), target)
-    expect_true(
-        all.equal(
-            target,
-            as.numeric(params_minibatch),
-            tolerance = 1e-4,
-            check.attributes = FALSE
-            ))
-    expect_true(
-        all.equal(
-            target,
-            as.numeric(params_stochastic),
-            tolerance = 1e-3,
-            check.attributes = FALSE
-            ))
+
+    minibatch <- LogisticRegression(epochs = 1e5, learning_rate = 0.001, momentum = 0.99, minibatch_size = 100)
+    minibatch$Fit(X, y)
+
+    expect_true(all(abs(minibatch$Coef() - target) / target < 1e-2))
+
+    stochastic <- LogisticRegression(epochs = 1e5, learning_rate = 0.001, momentum = 0.99, minibatch_size = 1)
+    stochastic$Fit(X, y)
+
+    expect_true(all(abs(stochastic$Coef() - target) / target < 1e-2))
 
 })
 
 
-test_that("stochastic_gradient_descent returns matrices with correct dimensions", {
+test_that("LogisticRegression$Coef returns matrices with correct dimensions", {
 
     d1 <- make_data(10, 1)
-    p1 <- stochastic_gradient_descent(d1[["X"]], d1[["y"]], 10, 0.1, 0.9)
-
+    l1 <- LogisticRegression()
+    l1$Fit(d1[["X"]], d1[["y"]])
+    p1 <- l1$Coef()
+    
     expect_true(nrow(p1) == 10)
     expect_true(ncol(p1) == 1)
 
     d2 <- make_data(10, 10)
-    p2 <- stochastic_gradient_descent(d2[["X"]], d2[["y"]], 10, 0.1, 0.9)
+    l2 <- LogisticRegression()
+    l2$Fit(d2[["X"]], d2[["y"]])
+    p2 <- l2$Coef()
 
     expect_true(nrow(p2) == 10)
     expect_true(ncol(p2) == 10)
@@ -82,12 +54,14 @@ test_that("stochastic_gradient_descent returns matrices with correct dimensions"
 })
 
 
-test_that("l2_reg shrinks weights", {
+test_that("LogisticRegression l2_reg shrinks weights", {
 
     d <- make_data(10, 1)
     p <- lapply(c(0, 1, 10, 25, 50, 100, 200, 1000), function(reg) {
         set.seed(1)
-        stochastic_gradient_descent(d[["X"]], d[["y"]], 1000, 0.01, 0.9, l2_reg = reg)
+        l <- LogisticRegression(epochs = 1e3, minibatch_size = 0, l2_reg = reg)
+        l$Fit(d[["X"]], d[["y"]])
+        l$Coef()
     })
 
     p <- do.call(cbind, p)

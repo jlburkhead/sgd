@@ -19,6 +19,8 @@ void stochastic_gradient_descent(NumericMatrix X,
   int n = X.nrow(); // number of observations
   int p = X.ncol(); // dimensionality
   int k = y.ncol(); // number of classes
+  if (minibatch_size == 0)
+    minibatch_size = n;
   int minibatches = (n - 1) / minibatch_size + 1; // number of minibatches
   Rcout.precision(10); // precision for print statements
 

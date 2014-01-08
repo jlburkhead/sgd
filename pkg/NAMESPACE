@@ -1,2 +1,3 @@
 useDynLib(sgd)
 exportPattern("^[[:alpha:]]+")
+export(LogisticRegression)

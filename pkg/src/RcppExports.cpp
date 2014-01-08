@@ -6,26 +6,3 @@
 
 using namespace Rcpp;
 
-// stochastic_gradient_descent
-NumericVector stochastic_gradient_descent(NumericMatrix X, NumericMatrix y, int epochs, double learning_rate, double momentum, int minibatch_size = 100, double l2_reg = 0.0, bool shuffle = true, int verbosity = 0);
-RcppExport SEXP sgd_stochastic_gradient_descent(SEXP XSEXP, SEXP ySEXP, SEXP epochsSEXP, SEXP learning_rateSEXP, SEXP momentumSEXP, SEXP minibatch_sizeSEXP, SEXP l2_regSEXP, SEXP shuffleSEXP, SEXP verbositySEXP) {
-BEGIN_RCPP
-    SEXP __sexp_result;
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< NumericMatrix >::type X(XSEXP );
-        Rcpp::traits::input_parameter< NumericMatrix >::type y(ySEXP );
-        Rcpp::traits::input_parameter< int >::type epochs(epochsSEXP );
-        Rcpp::traits::input_parameter< double >::type learning_rate(learning_rateSEXP );
-        Rcpp::traits::input_parameter< double >::type momentum(momentumSEXP );
-        Rcpp::traits::input_parameter< int >::type minibatch_size(minibatch_sizeSEXP );
-        Rcpp::traits::input_parameter< double >::type l2_reg(l2_regSEXP );
-        Rcpp::traits::input_parameter< bool >::type shuffle(shuffleSEXP );
-        Rcpp::traits::input_parameter< int >::type verbosity(verbositySEXP );
-        NumericVector __result = stochastic_gradient_descent(X, y, epochs, learning_rate, momentum, minibatch_size, l2_reg, shuffle, verbosity);
-        PROTECT(__sexp_result = Rcpp::wrap(__result));
-    }
-    UNPROTECT(1);
-    return __sexp_result;
-END_RCPP
-}

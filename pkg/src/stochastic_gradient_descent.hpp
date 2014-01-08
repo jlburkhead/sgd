@@ -8,14 +8,15 @@
 #include "cross_entropy.hpp"
 #include "shuffle_matrix.hpp"
 
-Rcpp::NumericVector stochastic_gradient_descent(Rcpp::NumericMatrix X, 
-						Rcpp::NumericMatrix y, 
-						int epochs, 
-						double learning_rate, 
-						double momentum, 
-						int minibatch_size,
-						double l2_reg,
-						bool shuffle,
-						int verbosity);
+void stochastic_gradient_descent(Rcpp::NumericMatrix X, 
+				 Rcpp::NumericMatrix y, 
+				 arma::mat& w,
+				 int epochs, 
+				 double learning_rate, 
+				 double momentum, 
+				 int minibatch_size,
+				 double l2_reg,
+				 bool shuffle,
+				 int verbosity);
 
 #endif

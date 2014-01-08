@@ -15,6 +15,7 @@ LinkingTo: Rcpp, RcppArmadillo
 Suggests:
     testthat
 Collate:
+    'LinearModels.R'
     'RcppExports.R'
     'zzz.R'
 RcppModules: LinearModels

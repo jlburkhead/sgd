@@ -6,27 +6,18 @@
 
 using namespace Rcpp;
 
-/***
 
-The benefit of doing this is that it leverages c++ OOP a little and mimics sklearn's API which I like.
-
-The major downside is there is no class inheritance so class definitions will have to be very verbose. ie it would be
-incredible to have a base_regressor class which has everything then a custom fit and predict functions but as far as i can
-tell that is not possible using Rcpp modules.
-  
- */
-
-class linear_regression {
+class base_regressor {
 public:
-  linear_regression(List l) : epochs(as<int>(l["epochs"])),
-			      learning_rate(as<double>(l["learning_rate"])),
-			      momentum(as<double>(l["momentum"])),
-			      minibatch_size(as<int>(l["minibatch_size"])),
-			      l2_reg(as<double>(l["l2_reg"])),
-			      shuffle(as<bool>(l["shuffle"])),
-			      verbosity(as<int>(l["verbosity"])) {}
+  base_regressor(List l) : epochs(as<int>(l["epochs"])),
+			   learning_rate(as<double>(l["learning_rate"])),
+			   momentum(as<double>(l["momentum"])),
+			   minibatch_size(as<int>(l["minibatch_size"])),
+			   l2_reg(as<double>(l["l2_reg"])),
+			   shuffle(as<bool>(l["shuffle"])),
+			   verbosity(as<int>(l["verbosity"])) {}
   
-  List params() {
+  List params() const {
     return List::create(Named("epochs") = epochs,
 			Named("learning_rate") = learning_rate,
 			Named("momentum") = momentum,
@@ -36,99 +27,81 @@ public:
 			Named("verbosity") = verbosity);
   }
   
-  void fit(NumericMatrix X, NumericMatrix y) {
-    stochastic_gradient_descent(X, y, w, activation,
-				epochs, learning_rate, momentum,
-				minibatch_size, l2_reg, shuffle, verbosity);
-  }
+  NumericMatrix coef() const { return wrap(w); }
   
-  NumericMatrix coef() {
-    return wrap(w);
-  }
+  virtual NumericMatrix predict(const NumericMatrix X) { return 0; }
+  virtual void fit(const NumericMatrix X, const NumericMatrix y) {}
   
-  NumericMatrix predict(NumericMatrix X) {
-    arma::mat Xm = as< arma::mat >(X);
-    return wrap(Xm * w);
-  }
-  
-private:
+protected:
   int epochs, minibatch_size, verbosity;
   double learning_rate, momentum, l2_reg;
   bool shuffle;
   arma::mat w;
+
+};
+
+class linear_regression : public base_regressor  {
+public:
+  linear_regression(List l_) : base_regressor(l_) {}
+
+  void fit(const NumericMatrix X, const NumericMatrix y) { 
+      stochastic_gradient_descent(X, y, w, activation, epochs, learning_rate, momentum, 
+				  minibatch_size, l2_reg, shuffle, verbosity);
+  }
+  
+  NumericMatrix predict(const NumericMatrix X) {
+    arma::mat Xm = as< arma::mat >(X);
+    return wrap(activation(Xm, w));
+  }
   
 };
 
 
-
-class logistic_regression {
+class logistic_regression : public base_regressor {
 public:
-  logistic_regression(List l) : epochs(as<int>(l["epochs"])),
-				learning_rate(as<double>(l["learning_rate"])),
-				momentum(as<double>(l["momentum"])),
-				minibatch_size(as<int>(l["minibatch_size"])),
-				l2_reg(as<double>(l["l2_reg"])),
-				shuffle(as<bool>(l["shuffle"])),
-				verbosity(as<int>(l["verbosity"])) {}
-  
-  List params() {
-    return List::create(Named("epochs") = epochs,
-			Named("learning_rate") = learning_rate,
-			Named("momentum") = momentum,
-			Named("minibatch_size") = minibatch_size,
-			Named("l2_reg") = l2_reg,
-			Named("shuffle") = shuffle,
-			Named("verbosity") = verbosity);
+  logistic_regression(List l_) : base_regressor(l_) {}
+
+  void fit(const NumericMatrix X, const NumericMatrix y) { 
+      stochastic_gradient_descent(X, y, w, sigmoid_activation, epochs, learning_rate, momentum, 
+				  minibatch_size, l2_reg, shuffle, verbosity);
   }
   
-  void fit(NumericMatrix X, NumericMatrix y) {
-    stochastic_gradient_descent(X, y, w, sigmoid_activation,
-				epochs, learning_rate, momentum,
-				minibatch_size, l2_reg, shuffle, verbosity);
-  }
-  
-  NumericMatrix coef() {
-    return wrap(w);
-  }
-  
-  NumericMatrix predict(NumericMatrix X) {
+  // TODO: a method to predict class
+  NumericMatrix predict(const NumericMatrix X) {
     arma::mat Xm = as< arma::mat >(X);
-    return wrap(Xm * w);
+    return wrap(activation(Xm, w));
   }
-  
-  NumericMatrix predict_proba(NumericMatrix X) {
+
+  NumericMatrix predict_proba(const NumericMatrix X) {
     arma::mat Xm = as< arma::mat >(X);
     return wrap(sigmoid(Xm * w));
   }
-  
-private:
-  int epochs, minibatch_size, verbosity;
-  double learning_rate, momentum, l2_reg;
-  bool shuffle;
-  arma::mat w;
   
 };
 
 
 
 RCPP_MODULE(LinearModels) {
-  class_<logistic_regression>("logistic_regression")
+  class_<base_regressor>("base_regressor")
     .constructor<List>()
     
-    .method("Params", &logistic_regression::params)
-    .method("Fit", &logistic_regression::fit)
-    .method("Coef", &logistic_regression::coef)
-    .method("Predict", &logistic_regression::predict)
+    .method("Params", &base_regressor::params)
+    .method("Coef", &base_regressor::coef)
+    .method("Fit", &base_regressor::fit)
+    .method("Predict", &base_regressor::predict)
+    ;
+    
+  class_<logistic_regression>("logistic_regression")
+    .derives<base_regressor>("base_regressor")
+    .constructor<List>()
+    
     .method("Predict_proba", &logistic_regression::predict_proba)
     ;
 
   class_<linear_regression>("linear_regression")
+    .derives<base_regressor>("base_regressor")
     .constructor<List>()
     
-    .method("Params", &linear_regression::params)
-    .method("Fit", &linear_regression::fit)
-    .method("Coef", &linear_regression::coef)
-    .method("Predict", &linear_regression::predict)
     ;
 
 }

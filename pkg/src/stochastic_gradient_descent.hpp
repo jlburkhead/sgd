@@ -4,13 +4,12 @@
 #include <RcppArmadillo.h>
 
 #include "gradient.hpp"
-#include "activation.hpp"
-#include "cross_entropy.hpp"
 #include "shuffle_matrix.hpp"
 
 void stochastic_gradient_descent(Rcpp::NumericMatrix X, 
 				 Rcpp::NumericMatrix y, 
 				 arma::mat& w,
+				 arma::mat (*act) (arma::mat, arma::mat),
 				 int epochs, 
 				 double learning_rate, 
 				 double momentum, 

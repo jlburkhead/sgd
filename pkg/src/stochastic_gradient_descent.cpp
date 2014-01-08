@@ -3,11 +3,10 @@
 
 using namespace Rcpp;
 
-// TODO: change this ridiculously long name
-
 void stochastic_gradient_descent(NumericMatrix X, 
 				 NumericMatrix y,
 				 arma::mat& w,
+				 arma::mat (*act) (arma::mat, arma::mat),
 				 int epochs, 
 				 double learning_rate, 
 				 double momentum,
@@ -52,24 +51,14 @@ void stochastic_gradient_descent(NumericMatrix X,
       arma::mat X_minibatch = Xm(s, arma::span::all);
       arma::mat y_minibatch = ym(s, arma::span::all);
       
-      arma::mat h = activation(X_minibatch, w);
+      arma::mat h = (*act)(X_minibatch, w);
       arma::mat g = gradient(X_minibatch, y_minibatch, h) + lambda % w; 
-
-      if (verbosity >= 2)
-	for (int j = 0; j < p; j++)
-	  Rcout << std::fixed << w[j] << std::endl;
 
       delta_w = momentum * delta_w + (1 - momentum) * learning_rate * g;
       w = w - delta_w;
 
-      arma::mat ce = cross_entropy(y_minibatch, h);
-      l += arma::accu(ce);
-
     }
      
-    if (verbosity >= 1)
-      Rcout << "epoch " << e + 1 << " cross-entropy:\t" << std::fixed << l << std::endl;
-
   }
 
 }

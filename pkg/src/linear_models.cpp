@@ -76,14 +76,32 @@ public:
     fit_(X, y, sigmoid_activation);
   }
   
-  // TODO: a method to predict class
+  // TODO: need to normalize probabilities - softmax
   NumericMatrix predict(const NumericMatrix X) {
     return predict_(X, sigmoid_activation);
   }
 
-  NumericMatrix predict_proba(const NumericMatrix X) {
-    arma::mat Xm = as< arma::mat >(X);
-    return wrap(sigmoid(Xm * w));
+  IntegerVector predict_class(const NumericMatrix X) {
+    int n = X.nrow();
+    arma::mat prob = as< arma::mat>(predict(X));
+    int k = prob.n_cols;
+    IntegerVector out(n);
+    
+    if (k == 1) {
+      for (int i = 0; i < n; i++)
+	out[i] = round(prob(i));
+      return out;
+    }
+    
+    // could put this in a which.max function
+    for (int i = 0; i < n; i++) {
+      arma::uword index;
+      arma::mat row = prob.row(i);
+      row.max(index);
+      out[i] = index + 1;
+    }
+    
+    return out;
   }
   
 };
@@ -105,7 +123,7 @@ RCPP_MODULE(LinearModels) {
     .derives<base_regressor>("base_regressor")
     .constructor<List>()
     
-    .method("Predict_proba", &logistic_regression::predict_proba)
+    .method("Predict_class", &logistic_regression::predict_class)
     ;
 
   class_<linear_regression>("linear_regression")

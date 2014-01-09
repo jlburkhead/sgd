@@ -22,7 +22,6 @@ make_data <- function(p, k, binary = FALSE, n = 100)
 
 test_that("LinearRegression converges to lm's output", {
 
-    set.seed(NULL)
     data(iris)
     y <- matrix(iris$Petal.Length)
     X <- model.matrix(Petal.Length ~ Sepal.Length, data = iris)
@@ -118,7 +117,25 @@ test_that("LogisticRegression$Coef returns matrices with correct dimensions", {
 })
 
 
+test_that("LogisticRegression$Predict_class returns valid classes", {
+
+    d1 <- make_data(10, 1, TRUE)
+    l1 <- LogisticRegression()
+    l1$Fit(d1[["X"]], d1[["y"]])
+
+    expect_true(all(l1$Predict_class(d1[["X"]]) %in% 0:1))
+    
+    d2 <- make_data(10, 5, TRUE)
+    l2 <- LogisticRegression()
+    l2$Fit(d2[["X"]], d2[["y"]])
+
+    expect_true(all(l2$Predict_class(d2[["X"]]) %in% 1:5))
+    
+})
+
+
 test_that("l2_reg shrinks weights", {
+    
     d <- make_data(10, 1)
     p <- lapply(c(0, 1, 10, 25, 50, 100, 200, 1000), function(reg) {
         set.seed(1)

@@ -1,6 +1,8 @@
 sgd
 ===========
 
+[![Build Status](https://travis-ci.org/jlburkhead/sgd.png?branch=master)](https://travis-ci.org/jlburkhead/sgd)
+
 
 
 
@@ -49,8 +51,8 @@ batch$Coef()
 
 ```
 ##         [,1]
-## [1,]  8.1041
-## [2,]  0.1272
+## [1,]  8.1068
+## [2,]  0.1275
 ## [3,] -3.2126
 ```
 
@@ -110,15 +112,15 @@ by(preds, iris$Species, colMeans)
 ```
 ## INDICES: setosa
 ##      V1      V2      V3 
-## 0.86027 0.10942 0.03032 
+## 0.86032 0.10936 0.03031 
 ## -------------------------------------------------------- 
 ## INDICES: versicolor
 ##      V1      V2      V3 
-## 0.01945 0.56311 0.41744 
+## 0.01928 0.56320 0.41752 
 ## -------------------------------------------------------- 
 ## INDICES: virginica
 ##       V1       V2       V3 
-## 0.003584 0.366710 0.629706
+## 0.003572 0.366705 0.629722
 ```
 
 
@@ -148,9 +150,9 @@ benchmark(glm = glm(y ~ X - 1, family = binomial), sgd_R = sgd_R(X, y, 500,
 
 ```
 ##    test replications elapsed relative user.self sys.self user.child
-## 1   glm          100   0.285    1.080     0.280    0.004          0
-## 3   sgd          100   0.264    1.000     0.264    0.000          0
-## 2 sgd_R          100   1.944    7.364     1.940    0.000          0
+## 1   glm          100   0.328    1.206     0.328        0          0
+## 3   sgd          100   0.272    1.000     0.272        0          0
+## 2 sgd_R          100   2.056    7.559     2.052        0          0
 ##   sys.child
 ## 1         0
 ## 3         0
@@ -173,7 +175,7 @@ valid_pred <- mnist$Predict_class(valid_X) - 1
 ```
 
 
-missclassification rate: 0.0937
+missclassification rate: 0.0932
 
 
 ## More benchmarks to come
@@ -189,7 +191,7 @@ proc.time() - ptm
 
 ```
 ##    user  system elapsed 
-##  106.91   22.81  110.12
+##  110.93   24.01  114.84
 ```
 
 ```r

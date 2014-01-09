@@ -1,6 +1,8 @@
 sgd
 ===========
 
+[![Build Status](https://travis-ci.org/jlburkhead/sgd.png?branch=master)](https://travis-ci.org/jlburkhead/sgd)
+
 ```{r knitr_options, echo=FALSE}
 
 opts_chunk$set(warning = FALSE)

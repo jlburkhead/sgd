@@ -7,7 +7,7 @@
   shuffle = TRUE
   )
 
-fill_params <- function(...)
+.fill_params <- function(...)
     {
         par <- list(...)
         drop <- setdiff(names(par), names(.default_params))
@@ -34,8 +34,8 @@ fill_params <- function(...)
 
 LogisticRegression <- function(...)
     {
-        par <- fill_params(...)
-        return(new(logistic_regression, par))
+        par <- .fill_params(...)
+        return(new(.__C__Rcpp_.logistic_regression, par))
     }
 
 #' Linear Regression Constructor
@@ -49,7 +49,7 @@ LogisticRegression <- function(...)
 
 LinearRegression <- function(...)
     {
-        par <- fill_params(...)
-        return(new(linear_regression, par))
+        par <- .fill_params(...)
+        return(new(.__C__Rcpp_.linear_regression, par))
     }
       

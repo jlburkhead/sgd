@@ -116,7 +116,7 @@ public:
 
 
 RCPP_MODULE(LinearModels) {
-  class_<base_regressor>("base_regressor")
+  class_<base_regressor>(".base_regressor")
     .constructor<List>()
     
     .method("Params", &base_regressor::params)
@@ -126,15 +126,15 @@ RCPP_MODULE(LinearModels) {
     .method("Predict", &base_regressor::predict)
     ;
     
-  class_<logistic_regression>("logistic_regression")
-    .derives<base_regressor>("base_regressor")
+  class_<logistic_regression>(".logistic_regression")
+    .derives<base_regressor>(".base_regressor")
     .constructor<List>()
     
     .method("Predict_class", &logistic_regression::predict_class)
     ;
 
-  class_<linear_regression>("linear_regression")
-    .derives<base_regressor>("base_regressor")
+  class_<linear_regression>(".linear_regression")
+    .derives<base_regressor>(".base_regressor")
     .constructor<List>()
     
     ;

@@ -5,6 +5,5 @@
 #include <RcppArmadilloExtensions/sample.h>
 
 void shuffle_matrix(arma::mat& A, arma::mat& B);
-void print_mat(arma::mat A, arma::mat B);
 
 #endif

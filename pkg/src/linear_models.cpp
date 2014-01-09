@@ -3,6 +3,7 @@
 #include "sigmoid.hpp"
 #include "stochastic_gradient_descent.hpp"
 #include "activation.hpp"
+#include "softmax.hpp"
 
 using namespace Rcpp;
 
@@ -76,9 +77,14 @@ public:
     fit_(X, y, sigmoid_activation);
   }
   
-  // TODO: need to normalize probabilities - softmax
   NumericMatrix predict(const NumericMatrix X) {
-    return predict_(X, sigmoid_activation);
+    NumericMatrix pred = predict_(X, sigmoid_activation);
+    if (pred.ncol() > 1) {
+      arma::mat predm = as< arma::mat >(pred);
+      softmax(predm);
+      pred = wrap(predm);
+    }
+    return pred;
   }
 
   IntegerVector predict_class(const NumericMatrix X) {
@@ -91,17 +97,18 @@ public:
       for (int i = 0; i < n; i++)
 	out[i] = round(prob(i));
       return out;
+    } else {
+      // could put this in a which.max function
+      for (int i = 0; i < n; i++) {
+	arma::uword index;
+	arma::mat row = prob.row(i);
+	row.max(index);
+	out[i] = index + 1;
+      }
+      
+      return out;
     }
-    
-    // could put this in a which.max function
-    for (int i = 0; i < n; i++) {
-      arma::uword index;
-      arma::mat row = prob.row(i);
-      row.max(index);
-      out[i] = index + 1;
-    }
-    
-    return out;
+
   }
   
 };

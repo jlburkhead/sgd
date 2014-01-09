@@ -70,7 +70,6 @@ multiclass <- LogisticRegression(epochs = 1e4, learning_rate = 0.01, momentum = 
 multiclass$Fit(X, multiclass_y)
 
 preds <- multiclass$Predict(X)
-preds <- t(apply(preds, 1, function(x) x / sum(x) ))
 
 by(preds, iris$Species, colMeans)
 
@@ -153,6 +152,7 @@ train_X <- model.matrix(label ~ ., data = train)
 train_y <- model.matrix(~ factor(train$label) - 1)
 
 valid_X <- model.matrix(label ~ ., data = valid)
+
 ```
 
 ```{r test_mnist}

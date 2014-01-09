@@ -49,9 +49,9 @@ batch$Coef()
 
 ```
 ##         [,1]
-## [1,]  8.1008
-## [2,]  0.1298
-## [3,] -3.2166
+## [1,]  8.1041
+## [2,]  0.1272
+## [3,] -3.2126
 ```
 
 
@@ -103,7 +103,6 @@ multiclass <- LogisticRegression(epochs = 10000, learning_rate = 0.01, momentum 
 multiclass$Fit(X, multiclass_y)
 
 preds <- multiclass$Predict(X)
-preds <- t(apply(preds, 1, function(x) x/sum(x)))
 
 by(preds, iris$Species, colMeans)
 ```
@@ -111,15 +110,15 @@ by(preds, iris$Species, colMeans)
 ```
 ## INDICES: setosa
 ##      V1      V2      V3 
-## 0.86052 0.10917 0.03031 
+## 0.86027 0.10942 0.03032 
 ## -------------------------------------------------------- 
 ## INDICES: versicolor
 ##      V1      V2      V3 
-## 0.01868 0.56351 0.41781 
+## 0.01945 0.56311 0.41744 
 ## -------------------------------------------------------- 
 ## INDICES: virginica
 ##       V1       V2       V3 
-## 0.003534 0.366691 0.629775
+## 0.003584 0.366710 0.629706
 ```
 
 
@@ -149,9 +148,9 @@ benchmark(glm = glm(y ~ X - 1, family = binomial), sgd_R = sgd_R(X, y, 500,
 
 ```
 ##    test replications elapsed relative user.self sys.self user.child
-## 1   glm          100   0.298    1.108     0.300        0          0
-## 3   sgd          100   0.269    1.000     0.268        0          0
-## 2 sgd_R          100   1.999    7.431     1.996        0          0
+## 1   glm          100   0.285    1.080     0.280    0.004          0
+## 3   sgd          100   0.264    1.000     0.264    0.000          0
+## 2 sgd_R          100   1.944    7.364     1.940    0.000          0
 ##   sys.child
 ## 1         0
 ## 3         0
@@ -174,7 +173,7 @@ valid_pred <- mnist$Predict_class(valid_X) - 1
 ```
 
 
-missclassification rate: 0.0926
+missclassification rate: 0.0937
 
 
 ## More benchmarks to come
@@ -190,7 +189,7 @@ proc.time() - ptm
 
 ```
 ##    user  system elapsed 
-##  110.37   23.62  113.85
+##  106.91   22.81  110.12
 ```
 
 ```r

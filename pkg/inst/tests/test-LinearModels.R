@@ -68,7 +68,6 @@ test_that("LinearRegression$Coef returns matrices with correct dimensions", {
 })
 
 
-
 test_that("LogisticRegression converges to glm's output", {
 
     data(iris)
@@ -113,6 +112,25 @@ test_that("LogisticRegression$Coef returns matrices with correct dimensions", {
 
     expect_true(nrow(p2) == 10)
     expect_true(ncol(p2) == 10)
+
+})
+
+
+test_that("LogisticRegression$Predict returns a matrix with normalized rows", {
+
+    d1 <- make_data(10, 1, TRUE)
+    l1 <- LogisticRegression()
+    l1$Fit(d1[["X"]], d1[["y"]])
+
+    pred <- l1$Predict(d1[["X"]])
+    expect_true(all(pred >= 0 & pred <= 1))
+
+    d2 <- make_data(10, 10, TRUE)
+    l2 <- LogisticRegression()
+    l2$Fit(d2[["X"]], d2[["y"]])
+
+    pred <- l2$Predict(d2[["X"]])
+    expect_true(all.equal(rowSums(pred), rep(1, nrow(pred))))
 
 })
 

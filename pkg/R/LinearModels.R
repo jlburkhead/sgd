@@ -4,8 +4,7 @@
   momentum = 0.9,
   minibatch_size = 100L,
   l2_reg = 0,
-  shuffle = TRUE,
-  verbosity = 0L
+  shuffle = TRUE
   )
 
 fill_params <- function(...)

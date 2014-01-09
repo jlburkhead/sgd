@@ -15,7 +15,7 @@ void stochastic_gradient_descent(Rcpp::NumericMatrix X,
 				 double momentum, 
 				 int minibatch_size,
 				 double l2_reg,
-				 bool shuffle,
-				 int verbosity);
+				 bool shuffle);
+
 
 #endif

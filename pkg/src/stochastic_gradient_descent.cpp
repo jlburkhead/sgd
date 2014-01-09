@@ -12,8 +12,7 @@ void stochastic_gradient_descent(NumericMatrix X,
 				 double momentum,
 				 int minibatch_size = 100,
 				 double l2_reg = 0.0,
-				 bool shuffle = true,
-				 int verbosity = 0) {
+				 bool shuffle = true) {
   
   RNGScope scope;
   int n = X.nrow(); // number of observations
@@ -22,7 +21,6 @@ void stochastic_gradient_descent(NumericMatrix X,
   if (minibatch_size == 0)
     minibatch_size = n;
   int minibatches = (n - 1) / minibatch_size + 1; // number of minibatches
-  Rcout.precision(10); // precision for print statements
 
   // TODO: initialize weights more better
   arma::mat Xm = as< arma::mat >(X);

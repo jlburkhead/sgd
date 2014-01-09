@@ -14,8 +14,7 @@ public:
 			   momentum(as<double>(l["momentum"])),
 			   minibatch_size(as<int>(l["minibatch_size"])),
 			   l2_reg(as<double>(l["l2_reg"])),
-			   shuffle(as<bool>(l["shuffle"])),
-			   verbosity(as<int>(l["verbosity"])) {}
+			   shuffle(as<bool>(l["shuffle"])) {}
   
   List params() const {
     return List::create(Named("epochs") = epochs,
@@ -23,8 +22,7 @@ public:
 			Named("momentum") = momentum,
 			Named("minibatch_size") = minibatch_size,
 			Named("l2_reg") = l2_reg,
-			Named("shuffle") = shuffle,
-			Named("verbosity") = verbosity);
+			Named("shuffle") = shuffle);
   }
   
   NumericMatrix coef() const { return wrap(w); }
@@ -38,7 +36,17 @@ public:
   virtual void fit(const NumericMatrix X, const NumericMatrix y) {}
   
 protected:
-  int epochs, minibatch_size, verbosity;
+  
+  void fit_(const NumericMatrix X, const NumericMatrix y, arma::mat (*act) (arma::mat, arma::mat)) {
+    stochastic_gradient_descent(X, y, w, act, epochs, learning_rate, momentum, minibatch_size, l2_reg, shuffle);
+  }
+  
+  NumericMatrix predict_(const NumericMatrix X, arma::mat (*act) (arma::mat, arma::mat)) {
+    arma::mat Xm = as< arma::mat >(X);
+    return wrap(act(Xm, w));
+  }
+  
+  int epochs, minibatch_size;
   double learning_rate, momentum, l2_reg;
   bool shuffle;
   arma::mat w;
@@ -48,15 +56,13 @@ protected:
 class linear_regression : public base_regressor  {
 public:
   linear_regression(List l_) : base_regressor(l_) {}
-
+  
   void fit(const NumericMatrix X, const NumericMatrix y) { 
-      stochastic_gradient_descent(X, y, w, activation, epochs, learning_rate, momentum, 
-				  minibatch_size, l2_reg, shuffle, verbosity);
+    fit_(X, y, activation);
   }
   
   NumericMatrix predict(const NumericMatrix X) {
-    arma::mat Xm = as< arma::mat >(X);
-    return wrap(activation(Xm, w));
+    return predict_(X, activation);
   }
   
 };
@@ -67,14 +73,12 @@ public:
   logistic_regression(List l_) : base_regressor(l_) {}
 
   void fit(const NumericMatrix X, const NumericMatrix y) { 
-      stochastic_gradient_descent(X, y, w, sigmoid_activation, epochs, learning_rate, momentum, 
-				  minibatch_size, l2_reg, shuffle, verbosity);
+    fit_(X, y, sigmoid_activation);
   }
   
   // TODO: a method to predict class
   NumericMatrix predict(const NumericMatrix X) {
-    arma::mat Xm = as< arma::mat >(X);
-    return wrap(activation(Xm, w));
+    return predict_(X, sigmoid_activation);
   }
 
   NumericMatrix predict_proba(const NumericMatrix X) {

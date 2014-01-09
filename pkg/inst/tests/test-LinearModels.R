@@ -148,3 +148,25 @@ test_that("l2_reg shrinks weights", {
     expect_true(all(diff(norms) < 0))
 
 })
+
+
+test_that("Link returns predictions at the level of the linear predictors", {
+
+    for (k in 1:2) {
+        d <- make_data(10, k)
+        mod <- LinearRegression()
+        mod$Fit(d[["X"]], d[["y"]])
+        
+        expect_equivalent(mod$Link(d[["X"]]), d[["X"]] %*% mod$Coef())
+    }
+
+    for (k in 1:2) {
+        d <- make_data(10, k, TRUE)
+        
+        mod <- LogisticRegression()
+        mod$Fit(d[["X"]], d[["y"]])
+        
+        expect_equivalent(mod$Link(d[["X"]]), d[["X"]] %*% mod$Coef())
+    }
+
+})

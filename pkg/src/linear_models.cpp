@@ -29,6 +29,11 @@ public:
   
   NumericMatrix coef() const { return wrap(w); }
   
+  NumericMatrix link(const NumericMatrix X) {
+    arma::mat Xm = as< arma::mat >(X);
+    return wrap(activation(Xm, w));
+  }
+  
   virtual NumericMatrix predict(const NumericMatrix X) { return 0; }
   virtual void fit(const NumericMatrix X, const NumericMatrix y) {}
   
@@ -87,6 +92,7 @@ RCPP_MODULE(LinearModels) {
     
     .method("Params", &base_regressor::params)
     .method("Coef", &base_regressor::coef)
+    .method("Link", &base_regressor::link)
     .method("Fit", &base_regressor::fit)
     .method("Predict", &base_regressor::predict)
     ;

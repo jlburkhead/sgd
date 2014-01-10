@@ -184,17 +184,17 @@ test_that("PoissonRegression converges to glm's output", {
 
     target <- coef(glm(y ~ X - 1, family = poisson))
 
-    batch <- PoissonRegression(epochs = 1e3, learning_rate = 0.01, momentum = 0.95, minibatch_size = 0)
+    batch <- PoissonRegression(epochs = 1e4, learning_rate = 0.01, momentum = 0.95, minibatch_size = 0)
     batch$Fit(X, y)
 
     expect_equivalent(as.numeric(batch$Coef()), target)
 
-    minibatch <- PoissonRegression(epochs = 1e5, learning_rate = 0.01, momentum = 0.99, minibatch_size = 100)
+    minibatch <- PoissonRegression(epochs = 1e5, learning_rate = 0.001, momentum = 0.99, minibatch_size = 100)
     minibatch$Fit(X, y)
     
     expect_true(all(abs(minibatch$Coef() - target) / target < 1e-2))
 
-    stochastic <- PoissonRegression(epochs = 1e5, learning_rate = 0.001, momentum = 0.99, minibatch_size = 1)
+    stochastic <- PoissonRegression(epochs = 1e5, learning_rate = 0.0001, momentum = 0.99, minibatch_size = 1)
     stochastic$Fit(X, y)
 
     expect_true(all(abs(stochastic$Coef() - target) / target < 1e-2))

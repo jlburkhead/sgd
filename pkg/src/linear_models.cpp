@@ -33,8 +33,13 @@ public:
     return wrap(activation(Xm, w));
   }
   
-  virtual NumericMatrix predict(const NumericMatrix X) { return 0; }
-  virtual void fit(const NumericMatrix X, const NumericMatrix y) {}
+  virtual NumericMatrix predict(const NumericMatrix X) { 
+    stop("Not implemented");
+    return 0; 
+  }
+  virtual void fit(const NumericMatrix X, const NumericMatrix y) {
+    stop("Not implemented");
+  }
   
 protected:
   
@@ -114,6 +119,19 @@ public:
 };
 
 
+class poisson_regression : public base_regressor {
+public:
+  poisson_regression(List l_) : base_regressor(l_) {}
+
+  void fit(const NumericMatrix X, const NumericMatrix y) {
+    fit_(X, y, poisson_activation);
+  }
+
+  NumericMatrix predict(const NumericMatrix X) {
+    return predict_(X, poisson_activation);
+  }
+
+};
 
 RCPP_MODULE(LinearModels) {
   class_<base_regressor>(".base_regressor")
@@ -137,6 +155,12 @@ RCPP_MODULE(LinearModels) {
     .derives<base_regressor>(".base_regressor")
     .constructor<List>()
     
+    ;
+
+  class_<poisson_regression>(".poisson_regression")
+    .derives<base_regressor>(".base_regressor")
+    .constructor<List>()
+
     ;
 
 }

@@ -8,7 +8,7 @@ Maintainer: Jake Burkhead <jlburkhead@ucdavis.edu>
 Description: Toy package to mess around with using Rcpp and RcppArmadillo to
     link c++ and R. Implements gradient descent in c++.
 References: Machine Learning, Murphy, Kevin.
-License: BSD_2_clause
+License: GPL (>= 2)
 Depends:
     R (>= 3.0.0), Rcpp (>= 0.10.6)
 LinkingTo: Rcpp, RcppArmadillo
@@ -19,3 +19,4 @@ Collate:
     'RcppExports.R'
     'zzz.R'
 RcppModules: LinearModels
+URL: https://github.com/jlburkhead/sgd

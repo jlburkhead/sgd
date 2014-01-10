@@ -7,5 +7,6 @@
 
 arma::mat activation(arma::mat X, arma::mat w);
 arma::mat sigmoid_activation(arma::mat X, arma::mat w);
+arma::mat poisson_activation(arma::mat X, arma::mat w);
 
 #endif

@@ -5,8 +5,10 @@ arma::mat activation(arma::mat X, arma::mat w) {
 }
 
 arma::mat sigmoid_activation(arma::mat X, arma::mat w) {
-  return sigmoid(activation(X, w));
+  return sigmoid(X * w);
 }
 
-
+arma::mat poisson_activation(arma::mat X, arma::mat w) {
+  return exp(X * w);
+}
 

@@ -14,7 +14,7 @@ Package: \tab sgd\cr
 Type: \tab Package\cr
 Version: \tab 1.0\cr
 Date: \tab 2013-12-28\cr
-License: \tab BSD\cr
+License: \tab GPL (>= 2)\cr
 }
 }
 \author{
@@ -23,11 +23,9 @@ Jake Burkhead
 Maintainer: Jake Burkhead <jlburkhead@ucdavis.edu>
 }
 \references{
+
   Machine Learning by Kevin Murphy
-  http://www.cs.toronto.edu/~hinton/csc2515/notes/lec6tutorial.pdf
+
+  \url{ http://www.cs.toronto.edu/~hinton/csc2515/notes/lec6tutorial.pdf }
 }
 \keyword{ package }
-\seealso{
-}
-\examples{
-}

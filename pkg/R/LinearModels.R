@@ -27,7 +27,7 @@
 #'
 #' Returns an instance of LogisticRegression with supplied parameters or defaults.
 #'
-#' @param ... named parameters to pass to the constructor
+#' @param ... named arguments to pass to the constructor
 #' @return LogisticRegression object
 #' @author Jake Burkhead <jlburkhead@@ucdavis.edu>
 #' @export
@@ -42,7 +42,7 @@ LogisticRegression <- function(...)
 #'
 #' Returns an instance of LinearRegression with supplied parameters or defaults
 #'
-#' @param ... named parameters to pass to the constructor
+#' @param ... named arguments to pass to the constructor
 #' @return LinearRegression object
 #' @author Jake Burkhead <jlburkhead@@ucdavis.edu>
 #' @export
@@ -53,3 +53,19 @@ LinearRegression <- function(...)
         return(new(.__C__Rcpp_.linear_regression, par))
     }
       
+
+#' Poisson Regression Constructor
+#'
+#' Returns an instance of PoissonRegression with supplied parameters or defaults
+#'
+#' @param ... named arguments to pass to the constructor
+#' @return PoissonRegression object
+#' @author Jake Burkhead <jlburkhead@@ucdavis.edu>
+#' @export
+
+PoissonRegression <- function(...)
+  {
+      par <- .fill_params(...)
+      return(new(.__C__Rcpp_.poisson_regression, par))
+  }
+    

@@ -4,7 +4,7 @@
 #include <RcppArmadillo.h>
 
 #include "gradient.hpp"
-#include "shuffle_matrix.hpp"
+#include "arma_utils.hpp"
 
 void stochastic_gradient_descent(Rcpp::NumericMatrix X, 
 				 Rcpp::NumericMatrix y, 

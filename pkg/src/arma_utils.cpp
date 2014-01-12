@@ -1,6 +1,30 @@
-#include "shuffle_matrix.hpp"
+#include "arma_utils.hpp"
 
 using namespace Rcpp;
+
+void row_normalize(arma::mat& X) {
+  for (int i = 0; i < X.n_rows; i++)
+    X.row(i) = X.row(i) / arma::accu(X.row(i));
+}
+
+IntegerVector row_max(arma::mat X) {
+  int n = X.n_rows;
+  IntegerVector out(n);
+
+  for (int i = 0; i < n; i++) {
+    arma::mat row = X(i, arma::span::all);
+    out[i] = which_max(row);
+  }
+
+  return out;
+
+}
+  
+int which_max(arma::mat X) {
+  arma::uword index;
+  X.max(index);
+  return index;
+}
 
 void shuffle_matrix(arma::mat& A, arma::mat& B) {
   

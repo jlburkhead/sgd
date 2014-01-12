@@ -24,10 +24,10 @@ test_that("LinearRegression converges to lm's output", {
 
     data(iris)
     y <- matrix(iris$Petal.Length)
-    X <- model.matrix(Petal.Length ~ Sepal.Length, data = iris)
-    X[,-1] <- scale(X[,-1])
+    X <- model.matrix(Petal.Length ~ Sepal.Length - 1, data = iris)
+    X <- scale(X)
     
-    target <- coef(lm(y ~ X - 1))
+    target <- coef(lm(y ~ X))
     
     batch <- LinearRegression(epochs = 1e3, learning_rate = 0.01, momentum = 0.95, minibatch_size = 0)
     batch$Fit(X, y)
@@ -54,11 +54,11 @@ test_that("LinearRegression$Coef returns matrices with correct dimensions", {
     l1$Fit(d1[["X"]], d1[["y"]])
     p1 <- l1$Coef()
     
-    expect_true(nrow(p1) == 10)
+    expect_true(nrow(p1) == 11)
     expect_true(ncol(p1) == 1)
 
     d2 <- make_data(10, 10)
-    l2 <- LinearRegression()
+    l2 <- LinearRegression(fit_intercept = FALSE)
     l2$Fit(d2[["X"]], d2[["y"]])
     p2 <- l2$Coef()
 
@@ -72,10 +72,10 @@ test_that("LogisticRegression converges to glm's output", {
 
     data(iris)
     y <- as.matrix(as.numeric(iris$Species == "versicolor"))
-    X <- model.matrix(Species ~ ., data = iris)
-    X[,-1] <- scale(X[,-1])
+    X <- model.matrix(Species ~ . - 1, data = iris)
+    X <- scale(X)
     
-    target <- coef(glm(y ~ X - 1, family = binomial))
+    target <- coef(glm(y ~ X, family = binomial))
 
     batch <- LogisticRegression(epochs = 1e5, momentum = 0.95, minibatch_size = 0)
     batch$Fit(X, y)
@@ -98,7 +98,7 @@ test_that("LogisticRegression converges to glm's output", {
 test_that("LogisticRegression$Coef returns matrices with correct dimensions", {
 
     d1 <- make_data(10, 1, TRUE)
-    l1 <- LogisticRegression()
+    l1 <- LogisticRegression(fit_intercept = FALSE)
     l1$Fit(d1[["X"]], d1[["y"]])
     p1 <- l1$Coef()
     
@@ -110,7 +110,7 @@ test_that("LogisticRegression$Coef returns matrices with correct dimensions", {
     l2$Fit(d2[["X"]], d2[["y"]])
     p2 <- l2$Coef()
 
-    expect_true(nrow(p2) == 10)
+    expect_true(nrow(p2) == 11)
     expect_true(ncol(p2) == 10)
 
 })
@@ -159,7 +159,7 @@ test_that("Link returns predictions at the level of the linear predictors", {
         mod <- LinearRegression()
         mod$Fit(d[["X"]], d[["y"]])
         
-        expect_equivalent(mod$Link(d[["X"]]), d[["X"]] %*% mod$Coef())
+        expect_equivalent(mod$Link(d[["X"]]), cbind(1, d[["X"]]) %*% mod$Coef())
     }
 
     for (k in 1:2) {
@@ -168,7 +168,7 @@ test_that("Link returns predictions at the level of the linear predictors", {
         mod <- LogisticRegression()
         mod$Fit(d[["X"]], d[["y"]])
         
-        expect_equivalent(mod$Link(d[["X"]]), d[["X"]] %*% mod$Coef())
+        expect_equivalent(mod$Link(d[["X"]]), cbind(1, d[["X"]]) %*% mod$Coef())
     }
 
 })
@@ -178,11 +178,11 @@ test_that("PoissonRegression converges to glm's output", {
 
     d <- read.csv(system.file("tests/testfiles/poisson_sim.csv", package = "sgd"))
     d$prog <- factor(d$prog)
-    X <- model.matrix(num_awards ~ prog + math, data = d)
-    X[,-1] <- scale(X[,-1])
+    X <- model.matrix(num_awards ~ prog + math, data = d)[, -1]
+    X <- scale(X)
     y <- as.matrix(d$num_awards)
 
-    target <- coef(glm(y ~ X - 1, family = poisson))
+    target <- coef(glm(y ~ X, family = poisson))
 
     batch <- PoissonRegression(epochs = 1e4, learning_rate = 0.01, momentum = 0.95, minibatch_size = 0)
     batch$Fit(X, y)
@@ -234,8 +234,8 @@ test_that("l2_reg shrinks weights", {
 
     d <- read.csv(system.file("tests/testfiles/poisson_sim.csv", package = "sgd"))
     d$prog <- factor(d$prog)
-    X <- model.matrix(num_awards ~ prog + math, data = d)
-    X[,-1] <- scale(X[,-1])
+    X <- model.matrix(num_awards ~ prog + math - 1, data = d)
+    X <- scale(X)
     y <- as.matrix(d$num_awards)
 
     p <- lapply(c(0, 1, 10, 25, 50, 100, 200, 1000), function(reg) {

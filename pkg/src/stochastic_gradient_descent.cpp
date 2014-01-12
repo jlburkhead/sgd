@@ -3,8 +3,8 @@
 
 using namespace Rcpp;
 
-void stochastic_gradient_descent(NumericMatrix X, 
-				 NumericMatrix y,
+void stochastic_gradient_descent(arma::mat Xm, 
+				 arma::mat ym,
 				 arma::mat& w,
 				 arma::mat (*act) (arma::mat, arma::mat),
 				 int epochs, 
@@ -12,25 +12,25 @@ void stochastic_gradient_descent(NumericMatrix X,
 				 double momentum,
 				 int minibatch_size = 100,
 				 double l2_reg = 0.0,
-				 bool shuffle = true) {
+				 bool shuffle = true,
+				 bool fit_intercept = true) {
   
   RNGScope scope;
-  int n = X.nrow(); // number of observations
-  int p = X.ncol(); // dimensionality
-  int k = y.ncol(); // number of classes
+  int n = Xm.n_rows; // number of observations
+  int p = Xm.n_cols; // dimensionality
+  int k = ym.n_cols; // number of classes
   if (minibatch_size == 0)
     minibatch_size = n;
   int minibatches = (n - 1) / minibatch_size + 1; // number of minibatches
 
   // TODO: initialize weights more better
-  arma::mat Xm = as< arma::mat >(X);
-  arma::mat ym = as< arma::mat >(y);
   if (w.n_cols == 0)
     w = arma::randn(p, k);
   arma::mat delta_w = arma::zeros(p, k);
   arma::mat lambda(p, k);
   lambda.fill(l2_reg);
-  lambda(0, 0) = 0; // don't penalize bias
+  if (fit_intercept)
+    lambda(0, 0) = 0; // don't penalize bias
     
   for (int e = 0; e < epochs; e++) {
     

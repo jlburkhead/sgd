@@ -19,7 +19,7 @@ set.seed(42)
 data(iris)
 y <- matrix(as.numeric(iris$Species == "versicolor"))
 multiclass_y <- model.matrix(~Species - 1, data = iris)
-X <- model.matrix(Species ~ Sepal.Length + Sepal.Width, data = iris)
+X <- model.matrix(Species ~ Sepal.Length + Sepal.Width - 1, data = iris)
 ```
 
 
@@ -28,11 +28,11 @@ X <- model.matrix(Species ~ Sepal.Length + Sepal.Width, data = iris)
 
 ```r
 
-coef(glm(y ~ X - 1, family = binomial))
+coef(glm(y ~ X, family = binomial))
 ```
 
 ```
-##  X(Intercept) XSepal.Length  XSepal.Width 
+##   (Intercept) XSepal.Length  XSepal.Width 
 ##        8.0928        0.1294       -3.2128
 ```
 
@@ -51,9 +51,9 @@ batch$Coef()
 
 ```
 ##         [,1]
-## [1,]  8.1068
-## [2,]  0.1275
-## [3,] -3.2126
+## [1,]  8.0974
+## [2,]  0.1302
+## [3,] -3.2154
 ```
 
 
@@ -112,15 +112,15 @@ by(preds, iris$Species, colMeans)
 ```
 ## INDICES: setosa
 ##      V1      V2      V3 
-## 0.86032 0.10936 0.03031 
+## 0.86038 0.10931 0.03031 
 ## -------------------------------------------------------- 
 ## INDICES: versicolor
-##      V1      V2      V3 
-## 0.01928 0.56320 0.41752 
+##     V1     V2     V3 
+## 0.0191 0.5633 0.4176 
 ## -------------------------------------------------------- 
 ## INDICES: virginica
 ##       V1       V2       V3 
-## 0.003572 0.366705 0.629722
+## 0.003561 0.366701 0.629738
 ```
 
 
@@ -138,8 +138,8 @@ data(iris)
 set.seed(42)
 
 y <- matrix(as.numeric(iris$Species == "versicolor"))
-X <- model.matrix(Species ~ Sepal.Length + Sepal.Width, data = iris)
-X[, -1] <- scale(X[, -1])
+X <- model.matrix(Species ~ Sepal.Length + Sepal.Width - 1, data = iris)
+X <- scale(X)
 
 sgd <- LogisticRegression(epochs = 500, learning_rate = 0.01, momentum = 0.95, 
     minibatch_size = 0)
@@ -150,9 +150,9 @@ benchmark(glm = glm(y ~ X - 1, family = binomial), sgd_R = sgd_R(X, y, 500,
 
 ```
 ##    test replications elapsed relative user.self sys.self user.child
-## 1   glm          100   0.328    1.206     0.328        0          0
-## 3   sgd          100   0.272    1.000     0.272        0          0
-## 2 sgd_R          100   2.056    7.559     2.052        0          0
+## 1   glm          100   0.268    1.055     0.264        0          0
+## 3   sgd          100   0.254    1.000     0.252        0          0
+## 2 sgd_R          100   2.052    8.079     2.048        0          0
 ##   sys.child
 ## 1         0
 ## 3         0
@@ -175,7 +175,7 @@ valid_pred <- mnist$Predict_class(valid_X) - 1
 ```
 
 
-missclassification rate: 0.0932
+missclassification rate: 0.0926
 
 
 ## More benchmarks to come
@@ -191,7 +191,7 @@ proc.time() - ptm
 
 ```
 ##    user  system elapsed 
-##  110.93   24.01  114.84
+##  107.06   19.16  105.12
 ```
 
 ```r

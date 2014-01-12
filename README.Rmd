@@ -21,7 +21,7 @@ set.seed(42)
 data(iris)
 y <- matrix(as.numeric(iris$Species == "versicolor"))
 multiclass_y <- model.matrix(~ Species - 1, data = iris)
-X <- model.matrix(Species ~ Sepal.Length + Sepal.Width, data = iris)
+X <- model.matrix(Species ~ Sepal.Length + Sepal.Width - 1, data = iris)
 
 ```
 
@@ -29,7 +29,7 @@ X <- model.matrix(Species ~ Sepal.Length + Sepal.Width, data = iris)
 
 ```{r glm}
 
-coef(glm(y ~ X - 1, family = binomial))
+coef(glm(y ~ X, family = binomial))
 
 ```
 
@@ -87,7 +87,8 @@ gradient <- function(X, y, h) t(X) %*% (h - y)
 
 sgd_R <- function(X, y, epochs, learning_rate, momentum)
   {
-    
+      
+    X <- cbind(1, X)
     n <- nrow(X)
     p <- ncol(X)
     k <- ncol(y)
@@ -119,8 +120,8 @@ data(iris)
 set.seed(42)
 
 y <- matrix(as.numeric(iris$Species == "versicolor"))
-X <- model.matrix(Species ~ Sepal.Length + Sepal.Width, data = iris)
-X[,-1] <- scale(X[,-1])
+X <- model.matrix(Species ~ Sepal.Length + Sepal.Width - 1, data = iris)
+X <- scale(X)
 
 sgd <- LogisticRegression(epochs = 500, learning_rate = 0.01, momentum = 0.95, minibatch_size = 0)
 
@@ -150,10 +151,10 @@ nan <- sapply(train, function(x) any(is.nan(x)) )
 train <- train[!nan]
 valid <- d[train_idx == 1, !nan]
 
-train_X <- model.matrix(label ~ ., data = train)
+train_X <- as.matrix(train[names(train) != "label"])
 train_y <- model.matrix(~ factor(train$label) - 1)
 
-valid_X <- model.matrix(label ~ ., data = valid)
+valid_X <- as.matrix(valid[names(valid) != "label"])
 
 ```
 

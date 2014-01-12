@@ -6,8 +6,8 @@
 #include "gradient.hpp"
 #include "arma_utils.hpp"
 
-void stochastic_gradient_descent(Rcpp::NumericMatrix X, 
-				 Rcpp::NumericMatrix y, 
+void stochastic_gradient_descent(arma::mat X, 
+				 arma::mat y, 
 				 arma::mat& w,
 				 arma::mat (*act) (arma::mat, arma::mat),
 				 int epochs, 
@@ -15,7 +15,8 @@ void stochastic_gradient_descent(Rcpp::NumericMatrix X,
 				 double momentum, 
 				 int minibatch_size,
 				 double l2_reg,
-				 bool shuffle);
+				 bool shuffle,
+				 bool fit_intercept);
 
 
 #endif

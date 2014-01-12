@@ -1,10 +1,11 @@
 .default_params <- list(
-  epochs = 100L,
-  learning_rate = 0.01,
-  momentum = 0.9,
-  minibatch_size = 100L,
-  l2_reg = 0,
-  shuffle = TRUE
+    epochs = 100L,
+    learning_rate = 0.01,
+    momentum = 0.9,
+    minibatch_size = 100L,
+    l2_reg = 0,
+    shuffle = TRUE,
+    fit_intercept = TRUE
   )
 
 .fill_params <- function(...)

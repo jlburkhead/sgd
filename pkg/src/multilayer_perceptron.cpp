@@ -6,32 +6,66 @@
 using namespace Rcpp;
 
 
-// class base_layer {
-// public:
-//   base_layer(int n_in, int n_out, arma::mat (*act_) (arma::mat, arma::mat)) : act(act_) {
-//     w = arma::randn(n_in, n_out);
-//     a(n_out, 1);
-//   }
+class base_layer {
+public:
+  base_layer(bool use_bias_, 
+	     arma::mat (*act_) (arma::mat, arma::mat), 
+	     arma::mat(*derivative_) (arma::mat)) :  use_bias(use_bias_),
+						     act(act_),
+						     derivative(derivative_) {}
   
-//   arma::mat forward_propagate(arma::mat X) {
-//     a = act(X, w);
-//     return a;
-//   }
+  arma::mat forward_propagate(arma::mat X) {
+    if (w.n_cols == 0) {
+      w = arma::randn(X.n_cols, size);
+      if (use_bias)
+	bias = arma::randn(1, size);
+    }
+    if (use_bias) {
+      X = arma::join_horiz(arma::ones(X.n_rows, 1), X);
+      arma::mat wb = arma::join_vert(bias, w);
+      a = act(X, wb);
+    } else {
+      a = act(X, w);
+    }
+    return a;
+  }
 
-//   arma::mat backpropagate(arma::mat delta, double learning_rate) {
-//     w = w - learning_rate * a % delta;
-//   }
+  arma::mat backpropagate(arma::mat delta, double learning_rate) {
+    w = w - learning_rate * a.t() * delta;
+    if (use_bias)
+      bias = bias - learning_rate * arma::mean(delta, 0);
+    return delta * w.t() % derivative(a);
+  }
 
-// protected:
-//   arma::mat w, a;
-//   arma::mat (*act) (arma::mat, arma::mat);
+protected:
+  int size;
+  bool use_bias;
+  arma::mat w, a, bias;
+  arma::mat (*act) (arma::mat, arma::mat);
+  arma::mat (*derivative) (arma::mat);
 
-// };
+};
 
-// class logistic_layer : public base_layer {
-// public:
-//   logistic_layer(int n_in, int n_out) : base_layer(n_in, n_out, sigmoid_activation) {}
+class logistic_layer : public base_layer {
+public:
+  logistic_layer() : base_layer(true, sigmoid_activation, d_sigmoid) {}
+};
 
+class softmax_layer : public base_layer {
+public:
+  softmax_layer() : base_layer(true, softmax_activation, d_sigmoid) {}
+};
+
+
+class mlp2 {
+public:
+  mlp2(int n_in, int n_hidden, int n_out, bool use_bias, double learning_rate_) : learning_rate(learning_rate_) {}
+  
+private:
+  double learning_rate;
+  logistic_layer hidden;
+  softmax_layer output;
+};
 
 class mlp {
 public:

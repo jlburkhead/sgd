@@ -18,5 +18,5 @@ Collate:
     'LinearModels.R'
     'RcppExports.R'
     'zzz.R'
-RcppModules: LinearModels
+RcppModules: LinearModels, MLP
 URL: https://github.com/jlburkhead/sgd

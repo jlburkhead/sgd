@@ -12,3 +12,9 @@ arma::mat poisson_activation(arma::mat X, arma::mat w) {
   return exp(X * w);
 }
 
+arma::mat softmax_activation(arma::mat X, arma::mat w) {
+  arma::mat unnorm = exp(X * w);
+  row_normalize(unnorm);
+  return unnorm;
+}
+    

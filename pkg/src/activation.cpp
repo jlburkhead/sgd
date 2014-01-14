@@ -8,7 +8,7 @@ arma::mat sigmoid_activation(arma::mat X, arma::mat w) {
   return sigmoid(X * w);
 }
 
-arma::mat poisson_activation(arma::mat X, arma::mat w) {
+arma::mat exponential_activation(arma::mat X, arma::mat w) {
   return exp(X * w);
 }
 

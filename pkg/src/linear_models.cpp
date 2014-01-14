@@ -117,11 +117,11 @@ public:
   poisson_regression(List l_) : base_regressor(l_) {}
 
   void fit(const NumericMatrix X, const NumericMatrix y) {
-    fit_(X, y, poisson_activation);
+    fit_(X, y, exponential_activation);
   }
 
   NumericMatrix predict(const NumericMatrix X) {
-    return predict_(X, poisson_activation);
+    return predict_(X, exponential_activation);
   }
 
 };

@@ -14,6 +14,8 @@ arma::mat poisson_activation(arma::mat X, arma::mat w) {
 
 arma::mat softmax_activation(arma::mat X, arma::mat w) {
   arma::mat unnorm = exp(X * w);
+  if (unnorm.n_cols == 1)
+    return sigmoid(X * w); // return sigmoid in the binary case
   row_normalize(unnorm);
   return unnorm;
 }

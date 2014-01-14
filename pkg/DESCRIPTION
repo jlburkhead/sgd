@@ -16,6 +16,7 @@ Suggests:
     testthat
 Collate:
     'LinearModels.R'
+    'MultilayerPerceptron.R'
     'RcppExports.R'
     'zzz.R'
 RcppModules: LinearModels, MLP

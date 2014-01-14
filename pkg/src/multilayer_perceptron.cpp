@@ -10,31 +10,50 @@ class base_layer {
 public:
   base_layer(bool use_bias_, 
 	     arma::mat (*act_) (arma::mat, arma::mat), 
-	     arma::mat(*derivative_) (arma::mat)) :  use_bias(use_bias_),
-						     act(act_),
-						     derivative(derivative_) {}
+	     arma::mat (*derivative_) (arma::mat)) :  use_bias(use_bias_),
+						      act(act_),
+						      derivative(derivative_) {}
   
   arma::mat forward_propagate(arma::mat X) {
-    if (w.n_cols == 0) {
-      w = arma::randn(X.n_cols, size);
-      if (use_bias)
-	bias = arma::randn(1, size);
-    }
-    if (use_bias) {
-      X = arma::join_horiz(arma::ones(X.n_rows, 1), X);
-      arma::mat wb = arma::join_vert(bias, w);
-      a = act(X, wb);
-    } else {
-      a = act(X, w);
-    }
+    if (w.n_cols == 0) 
+      init_weight_(X.n_cols, size);
+    a = activate_(X);
     return a;
   }
 
-  arma::mat backpropagate(arma::mat delta, double learning_rate) {
-    w = w - learning_rate * a.t() * delta;
+  arma::mat backpropagate(arma::mat previous_activation,
+			  arma::mat delta, 
+			  double learning_rate,
+			  int n) {
+    w = w - learning_rate * previous_activation.t() * delta / n;
     if (use_bias)
       bias = bias - learning_rate * arma::mean(delta, 0);
-    return delta * w.t() % derivative(a);
+    return delta * w.t() % derivative(previous_activation);
+  }
+  
+  arma::mat activate_(arma::mat X) {
+    arma::mat activation_(X.n_cols, size);
+    if (use_bias) {
+      X = arma::join_horiz(arma::ones(X.n_rows, 1), X);
+      arma::mat wb = arma::join_vert(bias, w);
+      activation_ = act(X, wb);
+    } else {
+      activation_ = act(X, w);
+    }
+    return activation_;
+  }
+  
+  void init_weight_(int n_in, int n_out) {
+    if (w.n_cols == 0) {
+      size = n_out;
+      w = arma::randn(n_in, n_out);
+      if (use_bias)
+	bias = arma::randn(1, n_out);
+    }
+  }
+  
+  arma::mat coef() {
+    return arma::join_vert(bias, w);
   }
 
 protected:
@@ -57,64 +76,60 @@ public:
 };
 
 
-class mlp2 {
+class mlp {
 public:
-  mlp2(int n_in, int n_hidden, int n_out, bool use_bias, double learning_rate_) : learning_rate(learning_rate_) {}
+  mlp(List l) : n_hidden(as<int>(l["n_hidden"])),
+		epochs(as<int>(l["epochs"])),
+		learning_rate(as<double>(l["learning_rate"])) {}
+
+  void fit(NumericMatrix X, NumericMatrix y) {
+    int n = X.nrow();
+    arma::mat Xm = as< arma::mat >(X);
+    arma::mat ym = as< arma::mat >(y);
+    
+    hidden.init_weight_(Xm.n_cols, n_hidden);
+    output.init_weight_(n_hidden, ym.n_cols);
+    
+    for (int e = 0; e < epochs; e++) {
+      arma::mat hidden_activation = hidden.forward_propagate(Xm);
+      arma::mat output_activation = output.forward_propagate(hidden_activation);
+      
+      arma::mat output_delta = output_activation - ym;
+      arma::mat hidden_delta = output.backpropagate(hidden_activation, 
+						    output_delta, 
+						    learning_rate,
+						    n);
+      hidden.backpropagate(Xm, hidden_delta, learning_rate, n);
+    }
+
+  }
   
+  NumericMatrix predict(NumericMatrix X) {
+    arma::mat Xm = as< arma::mat >(X);
+    return wrap(output.activate_(hidden.activate_(Xm)));
+  }
+  
+  List coef() {
+    return List::create(Named("hidden") = wrap(hidden.coef()),
+			Named("output") = wrap(output.coef()));
+  }
+
 private:
+  int n_hidden, epochs;
   double learning_rate;
   logistic_layer hidden;
   softmax_layer output;
 };
-
-class mlp {
-public:
-  mlp(NumericMatrix X, NumericMatrix y, int n_hidden, double learning_rate_) : learning_rate(learning_rate_) {
-    Xm = as< arma::mat >(X);
-    ym = as< arma::mat >(y);
-    w1 = arma::randn(Xm.n_cols, n_hidden);
-    w2 = arma::randn(n_hidden, ym.n_cols);
-    b1 = arma::randn(1, n_hidden);
-    b2 = arma::randn(1, ym.n_cols);
-  }
-  
-  
-  void fit(int epochs) {
-    for (int e = 0; e < epochs; e++) {
-      
-      arma::mat hidden_activation = sigmoid_activation(arma::join_horiz(arma::ones(Xm.n_rows, 1), Xm), arma::join_vert(b1, w1));
-      arma::mat output_activation = softmax_activation(arma::join_horiz(arma::ones(Xm.n_rows, 1), hidden_activation), arma::join_vert(b2, w2));
-      
-      arma::mat delta_output = ym - output_activation;
-      arma::mat delta_hidden = delta_output * w2.t() % sigmoid(hidden_activation) % (1 - sigmoid(hidden_activation));
-
-      w2 = w2 - hidden_activation.t() * delta_output * learning_rate;
-      w1 = w1 - Xm.t() * delta_hidden * learning_rate;
-      
-      b1 = b1 - arma::mean(delta_hidden, 0) * learning_rate;
-      b2 = b2 - arma::mean(delta_output, 0) * learning_rate;
-
-    }
-  }
-
-  NumericMatrix predict(NumericMatrix X) {
-    arma::mat Xm = as< arma::mat >(X);
-
-    return wrap(sigmoid(Xm * w1 * w2));
-  }
-
-private:
-  double learning_rate;
-  arma::mat Xm, ym, w1, w2, b1, b2;
-
-};
   
 
 RCPP_MODULE(MLP) {
-  class_<mlp>("mlp")
-    .constructor<NumericMatrix, NumericMatrix, int, double>()
+
+  class_<mlp>(".mlp")
+    .constructor<List>()
     
     .method("Fit", &mlp::fit)
     .method("Predict", &mlp::predict)
+    .method("Coef", &mlp::coef)
     ;
+
 }

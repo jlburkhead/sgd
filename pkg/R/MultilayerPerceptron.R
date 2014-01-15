@@ -7,8 +7,8 @@
 #' @author Jake Burkhead <jlburkhead@@ucdavis.edu>
 #' @export
 
-MultilayerPerceptron <- function(n_hidden = 10, ...)
+MLPClassifier <- function(n_hidden = 10, ...)
     {
         par <- .fill_params(...)
-        return(new(.__C__Rcpp_.mlp, c(n_hidden = n_hidden, par)))
+        return(new(.__C__Rcpp_.mlp_classifier, c(n_hidden = n_hidden, par)))
     }

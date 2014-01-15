@@ -1,5 +1,9 @@
 #include "activation.hpp"
 
+arma::mat identity(arma::mat X) {
+  return X;
+}
+
 arma::mat activation(arma::mat X, arma::mat w) {
   return X * w;
 }
@@ -12,10 +16,8 @@ arma::mat exponential_activation(arma::mat X, arma::mat w) {
   return exp(X * w);
 }
 
-arma::mat softmax_activation(arma::mat X, arma::mat w) {
-  arma::mat unnorm = exp(X * w);
-  if (unnorm.n_cols == 1)
-    return sigmoid(X * w); // return sigmoid in the binary case
+arma::mat softmax(arma::mat X) {
+  arma::mat unnorm = exp(X);
   row_normalize(unnorm);
   return unnorm;
 }

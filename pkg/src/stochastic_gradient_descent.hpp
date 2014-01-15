@@ -5,7 +5,6 @@
 
 #include "gradient.hpp"
 #include "arma_utils.hpp"
-#include "multilayer_perceptron.hpp"
 
 void stochastic_gradient_descent(Rcpp::NumericMatrix X, 
 				 Rcpp::NumericMatrix y, 
@@ -17,16 +16,5 @@ void stochastic_gradient_descent(Rcpp::NumericMatrix X,
 				 int minibatch_size,
 				 double l2_reg,
 				 bool shuffle);
-
-void mlp_gradient_descent(Rcpp::NumericMatrix X,
-			  Rcpp::NumericMatrix y,
-			  logistic_layer& ll,
-			  softmax_layer& sl,
-			  int epochs,
-			  double learning_rate,
-			  double momentum,
-			  int minibatch_size,
-			  double l2_reg,
-			  bool shuffle);
 
 #endif

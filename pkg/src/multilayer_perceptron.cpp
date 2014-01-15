@@ -1,105 +1,139 @@
 #include "multilayer_perceptron.hpp"
-#include "stochastic_gradient_descent.hpp"
-
 
 using namespace Rcpp;
 
+void print_dim(arma::mat X, std::string s) {
+  Rcout << s << "\t" << X.n_rows << "\t" << X.n_cols << std::endl;
+}
 
-base_layer::base_layer(bool use_bias_, 
-		       arma::mat (*act_) (arma::mat, arma::mat), 
-		       arma::mat (*derivative_) (arma::mat)) {
-  use_bias = use_bias_;
-  act = act_;
-  derivative = derivative_;
+
+base_mlp::base_mlp(List l) : n_hidden(as<int>(l["n_hidden"])),
+			     epochs(as<int>(l["epochs"])),
+			     learning_rate(as<double>(l["learning_rate"])),
+			     momentum(as<double>(l["momentum"])),
+			     minibatch_size(as<int>(l["minibatch_size"])),
+			     shuffle(as<bool>(l["shuffle"])),
+			     t(0) {}
+
+void base_mlp::init_fit_() {
+  
+  w1 = arma::randn(n_features, n_hidden);
+  delta_w1 = arma::randn(n_features, n_hidden);
+  w2 = arma::randn(n_hidden, n_outputs);
+  delta_w2 = arma::randn(n_hidden, n_outputs);
+  b1 = arma::randn(1, n_hidden);
+  delta_b1 = arma::randn(1, n_hidden);
+  b2 = arma::randn(1, n_outputs);
+  delta_b2 = arma::randn(1, n_outputs);
+  
+}
+
+void base_mlp::init_param_() {
+  
+  hidden_func = sigmoid;
+  hidden_derivative = d_sigmoid;
+  if (n_outputs > 1)
+    output_func = softmax;
+  else
+    output_func = sigmoid;
+}
+
+void base_mlp::fit_(arma::mat X, arma::mat y) {
+  
+  int n = X.n_rows;
+  n_outputs = y.n_cols;
+  n_features = X.n_cols;
+
+  if (t == 0 || w1.n_cols == 0) {
+    init_fit_();
+    init_param_();
+  }
+  
+  if (minibatch_size == 0)
+    minibatch_size = n;
+  int minibatches = (n - 1) / minibatch_size + 1;
+  
+  if (minibatch_size != n && shuffle)
+    shuffle_matrix(X, y);
+  
+  for (int i = 0; i < minibatches; i++) {
+    int start = i * minibatch_size;
+    int end = start + minibatch_size - 1;
+    if (end > n - 1)
+      end = n - 1;
+    arma::span s(start, end);
+
+    arma::mat X_minibatch = X(s, arma::span::all);
+    arma::mat y_minibatch = y(s, arma::span::all);
+    
+    hidden_activation = hidden_func(X_minibatch * w1 + arma::repmat(b1, minibatch_size, 1));
+    arma::mat output_activation = output_func(hidden_activation * w2 + arma::repmat(b2, minibatch_size, 1));
+
+    arma::mat delta_output = output_activation - y_minibatch;
+    arma::mat delta_hidden = delta_output * w2.t() % hidden_derivative(hidden_activation);
+
+    arma::mat w1_gradient = X_minibatch.t() * delta_hidden / minibatch_size;
+    arma::mat w2_gradient = hidden_activation.t() * delta_output / minibatch_size;
+    
+    arma::mat b1_gradient = arma::mean(delta_hidden, 0);
+    arma::mat b2_gradient = arma::mean(delta_output, 0);
+
+    delta_w1 = momentum * delta_w1 + (1 - momentum) * learning_rate * w1_gradient;
+    delta_w2 = momentum * delta_w2 + (1 - momentum) * learning_rate * w2_gradient;
+    delta_b1 = momentum * delta_b1 + (1 - momentum) * learning_rate * b1_gradient;
+    delta_b2 = momentum * delta_b2 + (1 - momentum) * learning_rate * b2_gradient;
+    
+    w1 = w1 - delta_w1;
+    w2 = w2 - delta_w2;
+    b1 = b1 - delta_b1;
+    b2 = b2 - delta_b2;
+    
+  }
+  
+  t++;
 
 }
   
-arma::mat base_layer::forward_propagate(arma::mat X) {
-  if (w.n_cols == 0) 
-    init_weight_(X.n_cols, size);
-  a = activate(X);
-  return a;
-}
+  
+arma::mat base_mlp::predict_(arma::mat X) {
 
-arma::mat base_layer::backpropagate(arma::mat delta, 
-				    double learning_rate,
-				    double momentum) {
-  delta_w = momentum * delta_w + (1 - momentum) * learning_rate * incoming_activation.t() * delta;
-  w = w - delta_w;
-  if (use_bias) {
-    delta_bias = momentum * delta_bias + (1 - momentum) * learning_rate * arma::sum(delta, 0);
-    bias = bias - delta_bias;
-  }
-  return delta * w.t() % derivative(incoming_activation);
-}
-
-arma::mat base_layer::activate(arma::mat X) {
-  incoming_activation = X;
-  arma::mat activation_(X.n_cols, size);
-  if (use_bias) {
-    X = arma::join_horiz(arma::ones(X.n_rows, 1), X);
-    arma::mat wb = arma::join_vert(bias, w);
-    activation_ = act(X, wb);
-  } else {
-    activation_ = act(X, w);
-  }
-  return activation_;
-}
-
-arma::mat base_layer::coef() {
-  return arma::join_vert(bias, w);
-}
-
-void base_layer::init_weight_(int n_in, int n_out) {
-  if (w.n_cols == 0) {
-    size = n_out;
-    w = arma::randn(n_in, n_out);
-    delta_w = arma::zeros(n_in, n_out);
-    if (use_bias) {
-      bias = arma::randn(1, n_out);
-      delta_bias = arma::zeros(1, n_out);
-    }
-  }
-}
-
-logistic_layer::logistic_layer() : base_layer(true, sigmoid_activation, d_sigmoid) {};
-
-softmax_layer::softmax_layer() : base_layer(true, softmax_activation, d_sigmoid) {};
-
-
-mlp::mlp(List l) { 
-
-  n_hidden = as<int>(l["n_hidden"]);
-  epochs = as<int>(l["epochs"]);
-  minibatch_size = as<int>(l["minibatch_size"]);
-  learning_rate = as<double>(l["learning_rate"]);
-  momentum = as<double>(l["momentum"]);
+  int n = X.n_rows;
+  
+  arma::mat ha = hidden_func(X * w1 + arma::repmat(b1, n, 1));
+  arma::mat oa = output_func(ha * w2 + arma::repmat(b2, n, 1));
+  
+  return oa;
 
 }
 
-void mlp::fit(NumericMatrix X, NumericMatrix y) {
-  mlp_gradient_descent(X, y, hidden, output, epochs, learning_rate, momentum, minibatch_size, l2_reg, shuffle);
-}
+mlp_classifier::mlp_classifier(List l) : base_mlp(l) {}
 
-NumericMatrix mlp::predict(NumericMatrix X) {
+void mlp_classifier::fit(NumericMatrix X, NumericMatrix y) {
   arma::mat Xm = as< arma::mat >(X);
-  return wrap(output.activate(hidden.activate(Xm)));
+  arma::mat ym = as< arma::mat >(y);
+  
+  for (int e = 0; e < epochs; e++)
+    fit_(Xm, ym);
+  
 }
 
-List mlp::coef() {
-  return List::create(Named("hidden") = wrap(hidden.coef()),
-		      Named("output") = wrap(output.coef()));
+NumericMatrix mlp_classifier::predict(NumericMatrix X) {
+  arma::mat Xm = as< arma::mat >(X);
+  return wrap(predict_(Xm));
 }
 
 
 RCPP_MODULE(MLP) {
-
-  class_<mlp>(".mlp")
+  class_<base_mlp>(".base_mlp")
     .constructor<List>()
     
-    .method("Fit", &mlp::fit)
-    .method("Predict", &mlp::predict)
-    .method("Coef", &mlp::coef)
     ;
 
+  class_<mlp_classifier>(".mlp_classifier")
+    .derives<base_mlp>(".base_mlp")
+    .constructor<List>()
+    
+    .method("Fit", &mlp_classifier::fit)
+    .method("Predict", &mlp_classifier::predict)
+    ;
 }

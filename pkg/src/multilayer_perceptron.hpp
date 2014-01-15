@@ -6,52 +6,34 @@
 #include "activation.hpp"
 #include "sigmoid.hpp"
 
-class base_layer {
+class base_mlp {
 public:
-  base_layer(bool use_bias_, 
-	     arma::mat (*act_) (arma::mat, arma::mat),
-	     arma::mat (*derivative_) (arma::mat));
+  base_mlp(Rcpp::List l);
 
-  arma::mat forward_propagate(arma::mat X);
-  arma::mat backpropagate(arma::mat delta, double learning_rate, double momentum);
-  arma::mat activate(arma::mat X);
-  arma::mat coef();
-    
-
-private:
-  void init_weight_(int n_in, int n_out);
-
-  int size;
-  bool use_bias;
-  arma::mat w, a, bias, incoming_activation, delta_w, delta_bias;
-  arma::mat (*act) (arma::mat, arma::mat);
-  arma::mat (*derivative) (arma::mat);
+protected:
+  void init_fit_();
+  void init_param_();
+  void fit_(arma::mat X, arma::mat y);
+  arma::mat predict_(arma::mat X);
+  
+  int n_hidden, n_features, n_outputs, epochs, t, minibatch_size;
+  double learning_rate, momentum;
+  bool shuffle;
+  arma::mat w1, w2, b1, b2, hidden_activation;
+  arma::mat delta_w1, delta_w2, delta_b1, delta_b2;
+  arma::mat (*hidden_func) (arma::mat);
+  arma::mat (*hidden_derivative) (arma::mat);
+  arma::mat (*output_func) (arma::mat);
 };
 
-class logistic_layer : public base_layer {
+class mlp_classifier : public base_mlp {
 public:
-  logistic_layer();
-};
-
-class softmax_layer : public base_layer {
-public:
-  softmax_layer();
-};
-
-class mlp {
-public:
-  mlp(Rcpp::List l);
+  mlp_classifier(Rcpp::List l);
 
   void fit(Rcpp::NumericMatrix X, Rcpp::NumericMatrix y);
   Rcpp::NumericMatrix predict(Rcpp::NumericMatrix X);
-  Rcpp::List coef();
-
-private:
-  bool shuffle;
-  int n_hidden, epochs, minibatch_size;
-  double learning_rate, momentum, l2_reg;
-  logistic_layer hidden;
-  softmax_layer output;
+  // Rcpp::NumericMatrix predict_class(Rcpp::NumericMatrix X);
 };
+
 
 #endif

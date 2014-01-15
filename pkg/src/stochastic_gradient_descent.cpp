@@ -10,9 +10,9 @@ void stochastic_gradient_descent(NumericMatrix X,
 				 int epochs, 
 				 double learning_rate, 
 				 double momentum,
-				 int minibatch_size = 100,
-				 double l2_reg = 0.0,
-				 bool shuffle = true) {
+				 int minibatch_size,
+				 double l2_reg,
+				 bool shuffle) {
   
   RNGScope scope;
   int n = X.nrow(); // number of observations
@@ -36,7 +36,7 @@ void stochastic_gradient_descent(NumericMatrix X,
     
     double l = 0;
     
-    if (shuffle && minibatch_size != n)
+    if (minibatch_size != n && shuffle)
       shuffle_matrix(Xm, ym);
     
     for (int i = 0; i < minibatches; i++) {
@@ -62,3 +62,53 @@ void stochastic_gradient_descent(NumericMatrix X,
 
 }
 
+
+void mlp_gradient_descent(NumericMatrix X,
+			  NumericMatrix y,
+			  logistic_layer& ll,
+			  softmax_layer& sl,
+			  int epochs,
+			  double learning_rate,
+			  double momentum,
+			  int minibatch_size,
+			  double l2_reg,
+			  bool shuffle) {
+  
+  RNGScope scope;
+  int n = X.nrow();
+  if (minibatch_size == 0)
+    minibatch_size = n;
+  int minibatches = (n - 1) / minibatch_size + 1;
+
+  arma::mat Xm = as< arma::mat >(X);
+  arma::mat ym = as< arma::mat >(y);
+
+  for (int e = 0; e < epochs; e++) {
+
+    if (minibatch_size != n && shuffle)
+      shuffle_matrix(Xm, ym)
+
+    for (int i = 0; i < minibatches; i++) {
+      
+      int start = i * minibatch_size;
+      int end = start + minibatch_size - 1;
+      if (end > n - 1)
+	end = n - 1;
+      arma::span s(start, end);
+
+      arma::mat X_minibatch = Xm(s, arma::span::all);
+      arma::mat y_minibatch = ym(s, arma::span::all);
+
+      arma::mat hidden_activation = ll.forward_propagate(X_minibatch);
+      arma::mat output_activation = sl.forward_propagate(hidden_activation);
+      
+      arma::mat output_delta = output_activation - ym;
+      arma::mat hidden_delta = sl.backpropagate(output_delta,
+						learning_rate,
+						momentum);
+      ll.backpropagate(hidden_delta, learning_rate, momentum);
+    }
+
+  }
+
+}

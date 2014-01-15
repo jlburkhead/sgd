@@ -10,6 +10,8 @@ class base_mlp {
 public:
   base_mlp(Rcpp::List l);
 
+  Rcpp::List coef();
+
 protected:
   void init_fit_();
   void init_param_();
@@ -17,7 +19,7 @@ protected:
   arma::mat predict_(arma::mat X);
   
   int n_hidden, n_features, n_outputs, epochs, t, minibatch_size;
-  double learning_rate, momentum;
+  double learning_rate, momentum, l2_reg;
   bool shuffle;
   arma::mat w1, w2, b1, b2, hidden_activation;
   arma::mat delta_w1, delta_w2, delta_b1, delta_b2;

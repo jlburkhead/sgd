@@ -31,10 +31,20 @@ train_y <- model.matrix(~ factor(train$label) - 1)
 
 valid_X <- model.matrix(label ~ . - 1, data = valid)
 
-mlp <- MLPClassifier(epochs = 200, n_hidden = 100, learning_rate = 0.1, momentum = 0.95, minibatch_size = 0)
-system.time(mlp$Fit(train_X, train_y))
+mlp <- MLPClassifier(epochs = 1, n_hidden = 800, learning_rate = 0.0001, momentum = 0.9, minibatch_size = 0, l2_reg = 0)
 
-prob <- mlp$Predict(valid_X)
-pred <- apply(prob, 1, which.max) - 1
+for (i in 1:10) {
 
-mean(pred != valid$label)
+  print(system.time(mlp$Fit(train_X, train_y)))
+  
+  train_prob <- mlp$Predict(train_X)
+  train_pred <- apply(train_prob, 1, which.max) - 1
+  
+  print(mean(train_pred != train$label))
+  
+  prob <- mlp$Predict(valid_X)
+  pred <- apply(prob, 1, which.max) - 1
+  
+  print(mean(pred != valid$label))
+  
+}

@@ -205,7 +205,7 @@ test_that("PoissonRegression converges to glm's output", {
 test_that("l2_reg shrinks weights", {
     
     d <- make_data(10, 1)
-    p <- lapply(c(0, 1, 10, 25, 50, 100, 200, 1000), function(reg) {
+    p <- lapply(c(0, 1, 2, 5), function(reg) {
         set.seed(1)
         l <- LinearRegression(epochs = 1e3, minibatch_size = 0, l2_reg = reg)
         l$Fit(d[["X"]], d[["y"]])
@@ -219,7 +219,7 @@ test_that("l2_reg shrinks weights", {
     expect_true(all(diff(norms) < 0))
     
     d <- make_data(10, 1, TRUE)
-    p <- lapply(c(0, 1, 10, 25, 50, 100, 200, 1000), function(reg) {
+    p <- lapply(c(0, 1, 2, 5), function(reg) {
         set.seed(1)
         l <- LogisticRegression(epochs = 1e3, minibatch_size = 0, l2_reg = reg)
         l$Fit(d[["X"]], d[["y"]])
@@ -238,7 +238,7 @@ test_that("l2_reg shrinks weights", {
     X[,-1] <- scale(X[,-1])
     y <- as.matrix(d$num_awards)
 
-    p <- lapply(c(0, 1, 10, 25, 50, 100, 200, 1000), function(reg) {
+    p <- lapply(c(0, 1, 2, 5), function(reg) {
       set.seed(1)
       l <- PoissonRegression(epochs = 1e3, minibatch_size = 0, l2_reg = reg)
       l$Fit(X, y)
@@ -249,8 +249,7 @@ test_that("l2_reg shrinks weights", {
 
     norms <- apply(p, 2, function(x) sum(x[-1] ^ 2) )
 
-    ## TODO: figure out why NaNs are showing up
-    
+    ## TODO: why are there NaNs
     expect_true(all(diff(na.omit(norms)) < 0))
     
 })

@@ -2,18 +2,20 @@
 
 using namespace Rcpp;
 
-void print_dim(arma::mat X, std::string s) {
-  Rcout << s << "\t" << X.n_rows << "\t" << X.n_cols << std::endl;
-}
-
 
 base_mlp::base_mlp(List l) : n_hidden(as<int>(l["n_hidden"])),
 			     epochs(as<int>(l["epochs"])),
 			     learning_rate(as<double>(l["learning_rate"])),
 			     momentum(as<double>(l["momentum"])),
 			     minibatch_size(as<int>(l["minibatch_size"])),
+			     l2_reg(as<double>(l["l2_reg"])),
 			     shuffle(as<bool>(l["shuffle"])),
 			     t(0) {}
+
+List base_mlp::coef() {
+  return List::create(Named("hidden") = wrap(arma::join_vert(b1, w1)),
+		      Named("output") = wrap(arma::join_vert(b2, w2)));
+}
 
 void base_mlp::init_fit_() {
   
@@ -65,15 +67,17 @@ void base_mlp::fit_(arma::mat X, arma::mat y) {
 
     arma::mat X_minibatch = X(s, arma::span::all);
     arma::mat y_minibatch = y(s, arma::span::all);
+
+    int this_minibatch_size = X_minibatch.n_rows; // don't use this
     
-    hidden_activation = hidden_func(X_minibatch * w1 + arma::repmat(b1, minibatch_size, 1));
-    arma::mat output_activation = output_func(hidden_activation * w2 + arma::repmat(b2, minibatch_size, 1));
+    hidden_activation = hidden_func(X_minibatch * w1 + arma::repmat(b1, this_minibatch_size, 1));
+    arma::mat output_activation = output_func(hidden_activation * w2 + arma::repmat(b2, this_minibatch_size, 1));
 
     arma::mat delta_output = output_activation - y_minibatch;
     arma::mat delta_hidden = delta_output * w2.t() % hidden_derivative(hidden_activation);
 
-    arma::mat w1_gradient = X_minibatch.t() * delta_hidden / minibatch_size;
-    arma::mat w2_gradient = hidden_activation.t() * delta_output / minibatch_size;
+    arma::mat w1_gradient = X_minibatch.t() * delta_hidden + l2_reg * w1 / this_minibatch_size ;
+    arma::mat w2_gradient = hidden_activation.t() * delta_output + l2_reg * w2 / this_minibatch_size;
     
     arma::mat b1_gradient = arma::mean(delta_hidden, 0);
     arma::mat b2_gradient = arma::mean(delta_output, 0);
@@ -127,6 +131,7 @@ RCPP_MODULE(MLP) {
   class_<base_mlp>(".base_mlp")
     .constructor<List>()
     
+    .method("Coef", &base_mlp::coef)
     ;
 
   class_<mlp_classifier>(".mlp_classifier")
